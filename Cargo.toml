@@ -1,0 +1,17 @@
+[package]
+name = "pyplanetarium"
+version = "0.1.0"
+description = "Python bindings for Rust Planetarium rendering library"
+repository = "https://github.com/ravenexp/pyplanetarium"
+authors = ["Sergey Kvachonok <ravenexp@gmail.com>"]
+edition = "2021"
+license = "MIT"
+keywords = ["astronomy", "simulation", "python"]
+categories = ["graphics", "science"]
+readme = "README.md"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.15", features = ["extension-module", "abi3-py37"] }

@@ -1,0 +1,8 @@
+# Rust stuff
+/target
+
+# Python stuff
+/dist
+
+# Vim tags
+tags

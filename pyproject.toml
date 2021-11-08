@@ -1,0 +1,5 @@
+# PEP 517 compatible config for maturin
+
+[build-system]
+requires = ["maturin>=0.11,<0.12"]
+build-backend = "maturin"
