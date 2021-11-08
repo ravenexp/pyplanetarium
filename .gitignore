@@ -3,6 +3,9 @@
 
 # Python stuff
 /dist
+.tox
+maturin_venv
+__pycache__
 
 # Vim tags
 tags
