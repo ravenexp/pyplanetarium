@@ -15,3 +15,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = { version = "0.15", features = ["extension-module", "abi3-py37"] }
+planetarium = "0.1"
