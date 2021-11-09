@@ -2,11 +2,16 @@
 //!
 //! The Python bindings are implemented entirely in Rust using PyO3.
 
+use pyo3::exceptions::PyNotImplementedError;
+use pyo3::types::PyBytes;
+
 use pyo3::prelude::*;
 
 use planetarium::{Pixel, Point, Vector};
 
-use planetarium::{Canvas as RsCanvas, SpotId as RsSpotId, SpotShape as RsSpotShape};
+use planetarium::{
+    Canvas as RsCanvas, ImageFormat as RsImageFormat, SpotId as RsSpotId, SpotShape as RsSpotShape,
+};
 
 /// Spot shape definition matrix
 ///
@@ -21,6 +26,10 @@ struct SpotShape(RsSpotShape);
 /// This class can not be instantiated by Python code.
 #[pyclass(module = "pyplanetarium", freelist = 8)]
 struct SpotId(RsSpotId);
+
+/// Exportable canvas image formats
+#[pyclass(module = "pyplanetarium", freelist = 8)]
+struct ImageFormat(RsImageFormat);
 
 /// Generates the synthesized image containing multiple light spots
 #[pyclass(module = "pyplanetarium")]
@@ -39,6 +48,18 @@ impl SpotShape {
     fn scale(&self, k: f32) -> SpotShape {
         SpotShape(self.0.scale(k))
     }
+}
+
+#[allow(non_upper_case_globals)]
+#[pymethods]
+impl ImageFormat {
+    /// `ImageFormat::PngGamma8Bpp` enum variant singleton.
+    #[classattr]
+    const PngGamma8Bpp: ImageFormat = ImageFormat(RsImageFormat::PngGamma8Bpp);
+
+    /// `ImageFormat::PngLinear16Bpp` enum variant singleton.
+    #[classattr]
+    const PngLinear16Bpp: ImageFormat = ImageFormat(RsImageFormat::PngLinear16Bpp);
 }
 
 #[pymethods]
@@ -104,6 +125,15 @@ impl Canvas {
     fn set_brightness(&mut self, brightness: f32) {
         self.0.set_brightness(brightness);
     }
+
+    /// Exports the canvas contents in the requested image format.
+    #[pyo3(text_signature = "($self, format, /)")]
+    fn export_image(&self, format: &ImageFormat, py: Python) -> PyResult<Py<PyBytes>> {
+        match self.0.export_image(format.0) {
+            Ok(b) => Ok(PyBytes::new(py, b.as_slice()).into()),
+            Err(e) => Err(PyNotImplementedError::new_err(e.to_string())),
+        }
+    }
 }
 
 /// Planetarium light spot rendering library bindings for Python.
@@ -122,6 +152,7 @@ fn pyplanetarium(_py: Python, m: &PyModule) -> PyResult<()> {
 
     m.add_class::<SpotShape>()?;
     m.add_class::<SpotId>()?;
+    m.add_class::<ImageFormat>()?;
     m.add_class::<Canvas>()?;
 
     Ok(())
