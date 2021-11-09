@@ -4,12 +4,42 @@
 
 use pyo3::prelude::*;
 
-use planetarium::Canvas as RsCanvas;
-use planetarium::Pixel;
+use planetarium::{Pixel, Point, Vector};
+
+use planetarium::{Canvas as RsCanvas, SpotId as RsSpotId, SpotShape as RsSpotShape};
+
+/// Spot shape definition matrix
+///
+/// A unit sized circular spot is scaled
+/// using the 2x2 transform matrix.
+#[pyclass(module = "pyplanetarium", freelist = 8)]
+#[pyo3(text_signature = "()")]
+struct SpotShape(RsSpotShape);
+
+/// Light spot descriptor type
+///
+/// This class can not be instantiated by Python code.
+#[pyclass(module = "pyplanetarium", freelist = 8)]
+struct SpotId(RsSpotId);
 
 /// Generates the synthesized image containing multiple light spots
 #[pyclass(module = "pyplanetarium")]
 struct Canvas(RsCanvas);
+
+#[pymethods]
+impl SpotShape {
+    // TODO: Accept more initializers like `k`, `[kx, ky]` or `[[xx, xy], [yx, yy]]`
+    #[new]
+    fn new() -> Self {
+        SpotShape(RsSpotShape::default())
+    }
+
+    /// Linearly scales the spot shape by a single scalar factor.
+    #[pyo3(text_signature = "(k, /)")]
+    fn scale(&self, k: f32) -> SpotShape {
+        SpotShape(self.0.scale(k))
+    }
+}
 
 #[pymethods]
 impl Canvas {
@@ -18,6 +48,31 @@ impl Canvas {
     #[pyo3(text_signature = "(width, height, /)")]
     fn new(width: u32, height: u32) -> Self {
         Canvas(RsCanvas::new(width, height))
+    }
+
+    /// Creates a new light spot on the canvas.
+    #[pyo3(text_signature = "($self, position, shape, intensity, /)")]
+    fn add_spot(&mut self, position: Point, shape: &SpotShape, intensity: f32) -> SpotId {
+        let id = self.0.add_spot(position, shape.0, intensity);
+        SpotId(id)
+    }
+
+    /// Sets the internal light spot position offset vector.
+    ///
+    /// The position offset vector is added to the immutable spot position
+    /// to calculate the spot rendering coordinates on the canvas.
+    #[pyo3(text_signature = "($self, spot, offset, /)")]
+    fn set_spot_offset(&mut self, spot: &SpotId, offset: Vector) {
+        self.0.set_spot_offset(spot.0, offset)
+    }
+
+    /// Sets the internal light spot illumination state.
+    ///
+    /// The spot illumination factor is multiplied with the immutable spot
+    /// intensity factor to calculate the rendered peak intensity.
+    #[pyo3(text_signature = "($self, spot, illumination, /)")]
+    fn set_spot_illumination(&mut self, spot: &SpotId, illumination: f32) {
+        self.0.set_spot_illumination(spot.0, illumination)
     }
 
     /// Clears the canvas image (fills with background pixels).
@@ -65,6 +120,8 @@ fn pyplanetarium(_py: Python, m: &PyModule) -> PyResult<()> {
     m.setattr("__version__", env!("CARGO_PKG_VERSION"))?;
     m.setattr("__author__", env!("CARGO_PKG_AUTHORS"))?;
 
+    m.add_class::<SpotShape>()?;
+    m.add_class::<SpotId>()?;
     m.add_class::<Canvas>()?;
 
     Ok(())
