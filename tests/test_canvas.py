@@ -4,7 +4,7 @@ pyplanetarium package integration tests
 
 import unittest
 
-from pyplanetarium import SpotShape, SpotId, Canvas
+from pyplanetarium import SpotShape, SpotId, Canvas, ImageFormat
 
 
 class CanvasCase(unittest.TestCase):
@@ -68,6 +68,42 @@ class CanvasCase(unittest.TestCase):
         self.assertNotEqual(spot1, spot2)
 
         canvas.draw()
+
+    def test_export_images(self) -> None:
+        """
+        Canvas image export test
+        """
+
+        shape1 = SpotShape().scale(3.5)
+        shape2 = SpotShape().scale(5.5)
+
+        width = 256
+        height = 256
+
+        canvas = Canvas.new(width, height)
+
+        spot1 = canvas.add_spot((180.5, 150.7), shape1, 0.8)
+        spot2 = canvas.add_spot((100.5, 110.7), shape2, 0.6)
+
+        self.assertNotEqual(spot1, spot2)
+
+        canvas.set_background(5000)
+
+        canvas.draw()
+
+        png8_bytes = canvas.export_image(ImageFormat.PngGamma8Bpp)
+        self.assertIsInstance(png8_bytes, bytes)
+        self.assertEqual(len(png8_bytes), 949)
+
+        png16_bytes = canvas.export_image(ImageFormat.PngLinear16Bpp)
+        self.assertIsInstance(png16_bytes, bytes)
+        self.assertEqual(len(png16_bytes), 1816)
+
+        # with open("image8.png", "wb") as f:
+        #     f.write(png8_bytes)
+
+        # with open("image16.png", "wb") as f:
+        #     f.write(png16_bytes)
 
 
 if __name__ == "__main__":
