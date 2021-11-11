@@ -2,6 +2,10 @@ variables:
     CARGO_HOME: "${CI_PROJECT_DIR}/cargo"
     RELEASE_NAME: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-g${CI_COMMIT_SHORT_SHA}-b${CI_PIPELINE_ID}"
     SITE_DIR: "doc"
+    TEST_PYPI_SERVER: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi"
+    TEST_PYPI_USER: "gitlab-ci-token"
+    TEST_PYPI_PASSWORD: "${CI_JOB_TOKEN}"
+    TEST_PYPI_INDEX_URL: "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/pypi/simple"
 
 default:
     tags:
@@ -12,6 +16,8 @@ stages:
   - build
   - test
   - wheels
+  - publish-test
+  - install-test
   - deploy
 
 image: ${PLG_CI_DOCKER_TAG}/rusty-python:latest
@@ -120,6 +126,29 @@ runtests:
       - maturin develop
       - python3 -m unittest --verbose
       - python3 -m pytest --verbose
+
+pubtest:
+    stage: publish-test
+    script:
+      - maturin upload --skip-existing -r "${TEST_PYPI_SERVER}" -u "${TEST_PYPI_USER}" -p "${TEST_PYPI_PASSWORD}" dist/*.whl
+
+test-install:
+    stage: install-test
+    image: ${PLG_CI_DOCKER_TAG}/python:latest
+    script:
+      - pip3 install "${CI_PROJECT_NAME}" --index-url "${TEST_PYPI_INDEX_URL}"
+      - python3 -m unittest
+
+test-install-win64:
+    stage: install-test
+    tags:
+      - windows-docker
+    image: ${PLG_CI_DOCKER_TAG}/python_2004:latest
+    variables:
+        ErrorActionPreference: stop
+    script:
+      - pip3 install "${CI_PROJECT_NAME}" --index-url "${TEST_PYPI_INDEX_URL}"
+      - python -m unittest
 
 publish-wheels:
     stage: deploy
