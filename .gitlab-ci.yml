@@ -56,6 +56,19 @@ compile:
         paths:
           - dist
 
+compile-win64:
+    stage: build
+    script:
+      - . windows/cross-build-env.sh
+      - cargo build --release
+      - mkdir -p dist
+      - cp "target/x86_64-pc-windows-gnu/release/${CI_PROJECT_NAME}.dll" "dist/${CI_PROJECT_NAME}.pyd"
+      - x86_64-w64-mingw32-strip "dist/${CI_PROJECT_NAME}.pyd"
+    artifacts:
+        name: "${RELEASE_NAME}-bin-win64"
+        paths:
+          - dist
+
 docs:
     stage: build
     script:
@@ -75,6 +88,17 @@ package:
       - cp -t dist target/wheels/*.whl
     artifacts:
         name: "${RELEASE_NAME}-wheel-lin64"
+        paths:
+          - dist
+
+package-win64:
+    stage: wheels
+    script:
+      - . windows/cross-build-env.sh
+      - maturin build --release --strip --target x86_64-pc-windows-gnu
+      - cp -t dist target/wheels/*.whl
+    artifacts:
+        name: "${RELEASE_NAME}-wheel-win64"
         paths:
           - dist
 
