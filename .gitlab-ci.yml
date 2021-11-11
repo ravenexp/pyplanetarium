@@ -1,0 +1,110 @@
+variables:
+    CARGO_HOME: "${CI_PROJECT_DIR}/cargo"
+    RELEASE_NAME: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-g${CI_COMMIT_SHORT_SHA}-b${CI_PIPELINE_ID}"
+    SITE_DIR: "doc"
+
+default:
+    tags:
+      - linux-docker
+
+stages:
+  - check
+  - build
+  - test
+  - wheels
+  - deploy
+
+image: ${PLG_CI_DOCKER_TAG}/rusty-python:latest
+
+cache:
+    key:
+        files:
+          - Cargo.lock
+    paths:
+      - cargo
+
+prefetch:
+    stage: .pre
+    script:
+      - mkdir -p .cargo
+      - echo "[source.crates-io]" > .cargo/config
+      - echo registry = \""${PLG_CI_CRATES_IO_MIRROR_INDEX}"\" >> .cargo/config
+      - cargo fetch
+    artifacts:
+        paths:
+          - .cargo
+
+fmt:
+    stage: check
+    script:
+      - cargo fmt -- --check
+
+clippy:
+    stage: check
+    script:
+      - cargo clippy
+
+compile:
+    stage: build
+    script:
+      - cargo build --release
+      - mkdir -p dist
+      - cp "target/release/lib${CI_PROJECT_NAME}.so" "dist/${CI_PROJECT_NAME}.so"
+      - strip "dist/${CI_PROJECT_NAME}.so"
+    artifacts:
+        name: "${RELEASE_NAME}-bin-lin64"
+        paths:
+          - dist
+
+docs:
+    stage: build
+    script:
+      - python3 -m venv --system-site-packages pdoc_venv
+      - . pdoc_venv/bin/activate
+      - maturin develop
+      - python3 -m pdoc -o html "${CI_PROJECT_NAME}"
+    artifacts:
+        name: "${RELEASE_NAME}-docs"
+        paths:
+          - html
+
+package:
+    stage: wheels
+    script:
+      - maturin build --release --strip
+      - cp -t dist target/wheels/*.whl
+    artifacts:
+        name: "${RELEASE_NAME}-wheel-lin64"
+        paths:
+          - dist
+
+typecheck:
+    stage: test
+    script:
+      - python3 -m venv --system-site-packages mypy_venv
+      - . mypy_venv/bin/activate
+      - maturin develop
+      - python3 -m pylint --extension-pkg-whitelist="${CI_PROJECT_NAME}" tests
+      - python3 -m mypy tests
+
+runtests:
+    stage: test
+    script:
+      - tox --index-url "${PLG_CI_PYPI_INDEX_URL}"
+      - python3 -m venv --system-site-packages test_venv
+      - . test_venv/bin/activate
+      - maturin develop
+      - python3 -m unittest --verbose
+      - python3 -m pytest --verbose
+
+publish-wheels:
+    stage: deploy
+    only:
+      - tags
+    script:
+      - maturin upload -r "${PLG_CI_PYPI_SERVER}" -u "${PLG_CI_PYPI_USER}" -p "${PLG_CI_PYPI_PASSWORD}" dist/*.whl
+
+include:
+  - project: 'devops/support'
+    ref: master
+    file: 'includes/artifacts/deploy-site.yml'
