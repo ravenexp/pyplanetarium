@@ -108,6 +108,16 @@ package-win64:
         paths:
           - dist
 
+package-sdist:
+    stage: wheels
+    script:
+      - maturin sdist
+      - cp -t dist target/wheels/*.tar.gz
+    artifacts:
+        name: "${RELEASE_NAME}-sdist"
+        paths:
+          - dist
+
 typecheck:
     stage: test
     script:
@@ -130,7 +140,7 @@ runtests:
 pubtest:
     stage: publish-test
     script:
-      - maturin upload --skip-existing -r "${TEST_PYPI_SERVER}" -u "${TEST_PYPI_USER}" -p "${TEST_PYPI_PASSWORD}" dist/*.whl
+      - maturin upload --skip-existing -r "${TEST_PYPI_SERVER}" -u "${TEST_PYPI_USER}" -p "${TEST_PYPI_PASSWORD}" dist/*.whl dist/*.tar.gz
 
 test-install:
     stage: install-test
@@ -155,7 +165,7 @@ publish-wheels:
     only:
       - tags
     script:
-      - maturin upload -r "${PLG_CI_PYPI_SERVER}" -u "${PLG_CI_PYPI_USER}" -p "${PLG_CI_PYPI_PASSWORD}" dist/*.whl
+      - maturin upload -r "${PLG_CI_PYPI_SERVER}" -u "${PLG_CI_PYPI_USER}" -p "${PLG_CI_PYPI_PASSWORD}" dist/*.whl dist/*.tar.gz
 
 include:
   - project: 'devops/support'
