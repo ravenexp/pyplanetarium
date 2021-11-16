@@ -229,9 +229,9 @@ dependencies = [
 
 [[package]]
 name = "planetarium"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "26373b08e746edbdb70eaca5b80ee5a5847ec13a767fc359a6ced37b316f9a1d"
+checksum = "86e52e5043a269cedadc341e1765517fbccee4e573be5d76174c330ad910ce2f"
 dependencies = [
  "libm",
  "png",
