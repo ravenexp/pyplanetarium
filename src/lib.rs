@@ -2,7 +2,7 @@
 //!
 //! The Python bindings are implemented entirely in Rust using PyO3.
 
-use pyo3::exceptions::PyNotImplementedError;
+use pyo3::exceptions::{PyNotImplementedError, PyTypeError};
 use pyo3::types::PyBytes;
 
 use pyo3::prelude::*;
@@ -17,8 +17,14 @@ use planetarium::{
 ///
 /// A unit sized circular spot is scaled
 /// using the 2x2 transform matrix.
+///
+/// The Python objects can be created as either:
+///
+/// - `SpotShape()` -- the default unit-sized shape
+/// - `SpotShape(k)` -- the default shape scaled by factor `k`
+/// - `SpotShape((kx, ky))` -- the default shape XY stretched by `kx` and `ky` factors
+/// - `SpotShape([[xx, xy], [yx, yy]])` -- explicit transform matrix initialization
 #[pyclass(module = "pyplanetarium", freelist = 8)]
-#[pyo3(text_signature = "()")]
 struct SpotShape(RsSpotShape);
 
 /// Light spot descriptor type
@@ -37,10 +43,40 @@ struct Canvas(RsCanvas);
 
 #[pymethods]
 impl SpotShape {
-    // TODO: Accept more initializers like `k`, `[kx, ky]` or `[[xx, xy], [yx, yy]]`
     #[new]
-    fn new() -> Self {
-        SpotShape(RsSpotShape::default())
+    fn new(src: Option<&PyAny>) -> PyResult<Self> {
+        if let Some(src) = src {
+            if let Ok(k) = src.extract::<f32>() {
+                Ok(SpotShape(RsSpotShape::default().scale(k)))
+            } else if let Ok((kx, ky)) = src.extract::<(f32, f32)>() {
+                Ok(SpotShape(RsSpotShape {
+                    xx: kx,
+                    xy: 0.0,
+                    yx: 0.0,
+                    yy: ky,
+                }))
+            } else if let Ok(mat) = src.extract::<Vec<Vec<f32>>>() {
+                if mat.len() == 2 && mat[0].len() == 2 && mat[1].len() == 2 {
+                    Ok(SpotShape(RsSpotShape {
+                        xx: mat[0][0],
+                        xy: mat[0][1],
+                        yx: mat[1][0],
+                        yy: mat[1][1],
+                    }))
+                } else {
+                    Err(PyTypeError::new_err(
+                        "Invalid initializer dimensions: must be 2x2",
+                    ))
+                }
+            } else {
+                Err(PyTypeError::new_err(format!(
+                    "Unexpected initializer type: '{}'",
+                    src.get_type().name().unwrap()
+                )))
+            }
+        } else {
+            Ok(SpotShape(RsSpotShape::default()))
+        }
     }
 
     /// Linearly scales the spot shape by a single scalar factor.

@@ -23,6 +23,24 @@ class CanvasCase(unittest.TestCase):
         shape2 = shape1.scale(3.5)
         self.assertNotEqual(shape1, shape2)
 
+        shape3 = SpotShape(3.5)
+        self.assertIsInstance(shape3, SpotShape)
+
+        shape4 = SpotShape((3.5, 2.5))
+        self.assertIsInstance(shape4, SpotShape)
+
+        shape5 = SpotShape([[3.5, 0.5], [-0.5, 2.5]])
+        self.assertIsInstance(shape5, SpotShape)
+
+        shape6 = SpotShape(3)
+        self.assertIsInstance(shape6, SpotShape)
+
+        shape7 = SpotShape((3, 2))
+        self.assertIsInstance(shape7, SpotShape)
+
+        shape8 = SpotShape([[3, 0], [0, 2]])
+        self.assertIsInstance(shape8, SpotShape)
+
         width = 1024
         height = 768
 
@@ -32,6 +50,53 @@ class CanvasCase(unittest.TestCase):
 
         canvas.set_background(1000)
         canvas.clear()
+
+    def test_init_err(self) -> None:
+        """
+        SpotShape and Canvas instantiation errors test
+        """
+
+        with self.assertRaises(TypeError):
+            SpotShape({})  # type: ignore
+
+        with self.assertRaises(TypeError):
+            SpotShape("1")  # type: ignore
+
+        with self.assertRaises(TypeError):
+            SpotShape((1,))  # type: ignore
+
+        with self.assertRaises(TypeError):
+            SpotShape([])  # type: ignore
+
+        with self.assertRaises(TypeError):
+            SpotShape([1])  # type: ignore
+
+        with self.assertRaises(TypeError):
+            SpotShape([1, 2])  # type: ignore
+
+        with self.assertRaises(TypeError):
+            SpotShape([1, 2, 3])  # type: ignore
+
+        with self.assertRaises(TypeError):
+            SpotShape([[1, 2], 2])  # type: ignore
+
+        with self.assertRaises(TypeError):
+            SpotShape([[1, 2], [2]])  # type: ignore
+
+        with self.assertRaises(TypeError):
+            SpotShape([[1, 2], [2, 3, 4]])  # type: ignore
+
+        with self.assertRaises(TypeError):
+            SpotShape([[1, 2], [2, 3], 4])  # type: ignore
+
+        with self.assertRaises(TypeError):
+            Canvas.new()  # type: ignore
+
+        with self.assertRaises(TypeError):
+            Canvas.new(100)  # type: ignore
+
+        with self.assertRaises(TypeError):
+            Canvas.new((100, 200))  # type: ignore
 
     def test_draw_spots(self) -> None:
         """

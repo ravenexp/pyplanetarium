@@ -1,11 +1,14 @@
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 # Type aliases for Rust library types
 Point = Tuple[float, float]
 Vector = Tuple[float, float]
 
+# Python 2D array type alias
+Matrix = List[List[float]]
+
 class SpotShape:
-    def __init__(self) -> None: ...
+    def __init__(self, src: Union[None, float, Vector, Matrix] = None) -> None: ...
     def scale(self, k: float) -> SpotShape: ...
 
 # Token class
