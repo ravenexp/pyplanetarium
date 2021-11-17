@@ -53,6 +53,18 @@ impl SpotShape {
 #[allow(non_upper_case_globals)]
 #[pymethods]
 impl ImageFormat {
+    /// `ImageFormat::RawGamma8Bpp` enum variant singleton.
+    #[classattr]
+    const RawGamma8Bpp: ImageFormat = ImageFormat(RsImageFormat::RawGamma8Bpp);
+
+    /// `ImageFormat::RawLinear10BppLE` enum variant singleton.
+    #[classattr]
+    const RawLinear10BppLE: ImageFormat = ImageFormat(RsImageFormat::RawLinear10BppLE);
+
+    /// `ImageFormat::RawLinear12BppLE` enum variant singleton.
+    #[classattr]
+    const RawLinear12BppLE: ImageFormat = ImageFormat(RsImageFormat::RawLinear12BppLE);
+
     /// `ImageFormat::PngGamma8Bpp` enum variant singleton.
     #[classattr]
     const PngGamma8Bpp: ImageFormat = ImageFormat(RsImageFormat::PngGamma8Bpp);
@@ -76,6 +88,26 @@ impl Canvas {
     fn add_spot(&mut self, position: Point, shape: &SpotShape, intensity: f32) -> SpotId {
         let id = self.0.add_spot(position, shape.0, intensity);
         SpotId(id)
+    }
+
+    /// Calculates the canvas coordinates of the light spot.
+    ///
+    /// The canvas coordinates are calculated as the immutable spot position coordinates
+    /// shifted by the variable spot offset vector and transformed using the canvas
+    /// world transform.
+    #[pyo3(text_signature = "($self, spot, /)")]
+    fn spot_position(&self, spot: &SpotId) -> Option<Point> {
+        self.0.spot_position(spot.0)
+    }
+
+    /// Calculates the effective peak intensity of the light spot.
+    ///
+    /// The effective peak intensity is calculated as the product of the immutable spot
+    /// intensity factor, the variable spot illumination factor
+    /// and the global brightness level.
+    #[pyo3(text_signature = "($self, spot, /)")]
+    fn spot_intensity(&self, spot: &SpotId) -> Option<f32> {
+        self.0.spot_intensity(spot.0)
     }
 
     /// Sets the internal light spot position offset vector.
