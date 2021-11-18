@@ -84,6 +84,19 @@ impl SpotShape {
     fn scale(&self, k: f32) -> SpotShape {
         SpotShape(self.0.scale(k))
     }
+
+    /// Implements `str(x)` in Python.
+    fn __str__(&self) -> String {
+        format!(
+            "[[{}, {}], [{}, {}]]",
+            self.0.xx, self.0.xy, self.0.yx, self.0.yy
+        )
+    }
+
+    /// Implements `repr(x)` in Python.
+    fn __repr__(&self) -> String {
+        format!("{:?}", self.0)
+    }
 }
 
 #[allow(non_upper_case_globals)]
@@ -108,6 +121,11 @@ impl ImageFormat {
     /// `ImageFormat::PngLinear16Bpp` enum variant singleton.
     #[classattr]
     const PngLinear16Bpp: ImageFormat = ImageFormat(RsImageFormat::PngLinear16Bpp);
+
+    /// Implements `repr(x)` in Python.
+    fn __repr__(&self) -> String {
+        format!("{:?}", self.0)
+    }
 }
 
 #[pymethods]
@@ -201,6 +219,12 @@ impl Canvas {
             Ok(b) => Ok(PyBytes::new(py, b.as_slice()).into()),
             Err(e) => Err(PyNotImplementedError::new_err(e.to_string())),
         }
+    }
+
+    /// Implements `repr(x)` in Python.
+    fn __repr__(&self) -> String {
+        let (w, h) = self.0.dimensions();
+        format!("Canvas({}, {})", w, h)
     }
 }
 

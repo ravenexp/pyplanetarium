@@ -19,18 +19,34 @@ class CanvasCase(unittest.TestCase):
 
         shape1 = SpotShape()
         self.assertIsInstance(shape1, SpotShape)
+        self.assertEqual(str(shape1), "[[1, 0], [0, 1]]")
+        self.assertEqual(
+            repr(shape1), "SpotShape { xx: 1.0, xy: 0.0, yx: 0.0, yy: 1.0 }"
+        )
 
         shape2 = shape1.scale(3.5)
         self.assertNotEqual(shape1, shape2)
 
         shape3 = SpotShape(3.5)
         self.assertIsInstance(shape3, SpotShape)
+        self.assertEqual(str(shape3), "[[3.5, 0], [0, 3.5]]")
+        self.assertEqual(
+            repr(shape3), "SpotShape { xx: 3.5, xy: 0.0, yx: 0.0, yy: 3.5 }"
+        )
 
         shape4 = SpotShape((3.5, 2.5))
         self.assertIsInstance(shape4, SpotShape)
+        self.assertEqual(str(shape4), "[[3.5, 0], [0, 2.5]]")
+        self.assertEqual(
+            repr(shape4), "SpotShape { xx: 3.5, xy: 0.0, yx: 0.0, yy: 2.5 }"
+        )
 
         shape5 = SpotShape([[3.5, 0.5], [-0.5, 2.5]])
         self.assertIsInstance(shape5, SpotShape)
+        self.assertEqual(str(shape5), "[[3.5, 0.5], [-0.5, 2.5]]")
+        self.assertEqual(
+            repr(shape5), "SpotShape { xx: 3.5, xy: 0.5, yx: -0.5, yy: 2.5 }"
+        )
 
         shape6 = SpotShape(3)
         self.assertIsInstance(shape6, SpotShape)
@@ -47,6 +63,9 @@ class CanvasCase(unittest.TestCase):
         canvas = Canvas.new(width, height)
         self.assertIsInstance(canvas, Canvas)
         self.assertEqual(canvas.dimensions(), (width, height))
+
+        self.assertEqual(str(canvas), "Canvas(1024, 768)")
+        self.assertEqual(repr(canvas), "Canvas(1024, 768)")
 
         canvas.set_background(1000)
         canvas.clear()
@@ -97,6 +116,18 @@ class CanvasCase(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             Canvas.new((100, 200))  # type: ignore
+
+    def test_enum_repr(self) -> None:
+        """
+        Enum variants string representation test
+        """
+
+        self.assertEqual(str(ImageFormat.PngGamma8Bpp), "PngGamma8Bpp")
+        self.assertEqual(repr(ImageFormat.PngGamma8Bpp), "PngGamma8Bpp")
+        self.assertEqual(repr(ImageFormat.PngLinear16Bpp), "PngLinear16Bpp")
+        self.assertEqual(repr(ImageFormat.RawGamma8Bpp), "RawGamma8Bpp")
+        self.assertEqual(repr(ImageFormat.RawLinear10BppLE), "RawLinear10BppLE")
+        self.assertEqual(repr(ImageFormat.RawLinear12BppLE), "RawLinear12BppLE")
 
     def test_draw_spots(self) -> None:
         """
