@@ -1,6 +1,6 @@
 [package]
 name = "pyplanetarium"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python bindings for Rust Planetarium rendering library"
 repository = "https://github.com/ravenexp/pyplanetarium"
 authors = ["Sergey Kvachonok <ravenexp@gmail.com>"]
