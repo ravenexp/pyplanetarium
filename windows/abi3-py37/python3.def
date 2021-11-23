@@ -41,6 +41,7 @@ PyErr_Restore
 PyErr_WarnEx
 PyEval_EvalCode
 PyEval_InitThreads
+PyEval_RestoreThread
 PyEval_SaveThread
 PyEval_ThreadsInitialized
 PyExc_ArithmeticError
@@ -163,6 +164,7 @@ PySet_Size
 PySet_Type
 PySlice_New
 PySlice_Type
+PyTraceBack_Print
 PyTuple_GetItem
 PyTuple_GetSlice
 PyTuple_New
@@ -189,3 +191,4 @@ _Py_FalseStruct
 _Py_NoneStruct
 _Py_NotImplementedStruct
 _Py_TrueStruct
+PyTraceBack_Type DATA
