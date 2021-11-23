@@ -7,7 +7,7 @@ use pyo3::types::PyBytes;
 
 use pyo3::prelude::*;
 
-use planetarium::{Pixel, Point, Vector};
+use planetarium::{Matrix, Pixel, Point, Vector};
 
 use planetarium::{
     Canvas as RsCanvas, ImageFormat as RsImageFormat, SpotId as RsSpotId, SpotShape as RsSpotShape,
@@ -47,27 +47,11 @@ impl SpotShape {
     fn new(src: Option<&PyAny>) -> PyResult<Self> {
         if let Some(src) = src {
             if let Ok(k) = src.extract::<f32>() {
-                Ok(SpotShape(RsSpotShape::default().scale(k)))
-            } else if let Ok((kx, ky)) = src.extract::<(f32, f32)>() {
-                Ok(SpotShape(RsSpotShape {
-                    xx: kx,
-                    xy: 0.0,
-                    yx: 0.0,
-                    yy: ky,
-                }))
-            } else if let Ok(mat) = src.extract::<Vec<Vec<f32>>>() {
-                if mat.len() == 2 && mat[0].len() == 2 && mat[1].len() == 2 {
-                    Ok(SpotShape(RsSpotShape {
-                        xx: mat[0][0],
-                        xy: mat[0][1],
-                        yx: mat[1][0],
-                        yy: mat[1][1],
-                    }))
-                } else {
-                    Err(PyTypeError::new_err(
-                        "Invalid initializer dimensions: must be 2x2",
-                    ))
-                }
+                Ok(SpotShape(k.into()))
+            } else if let Ok(kxy) = src.extract::<(f32, f32)>() {
+                Ok(SpotShape(kxy.into()))
+            } else if let Ok(mat) = src.extract::<Matrix>() {
+                Ok(SpotShape(mat.into()))
             } else {
                 Err(PyTypeError::new_err(format!(
                     "Unexpected initializer type: '{}'",
@@ -87,10 +71,7 @@ impl SpotShape {
 
     /// Implements `str(x)` in Python.
     fn __str__(&self) -> String {
-        format!(
-            "[[{}, {}], [{}, {}]]",
-            self.0.xx, self.0.xy, self.0.yx, self.0.yy
-        )
+        self.0.to_string()
     }
 
     /// Implements `repr(x)` in Python.
