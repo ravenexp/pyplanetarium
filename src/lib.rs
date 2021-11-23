@@ -80,6 +80,19 @@ impl SpotShape {
     }
 }
 
+#[pymethods]
+impl SpotId {
+    /// Implements `repr(x)` in Python.
+    fn __repr__(&self) -> String {
+        format!("SpotId({})", self.0)
+    }
+
+    /// Implements `hash(x)` in Python.
+    fn __hash__(&self) -> usize {
+        self.0 as usize
+    }
+}
+
 #[allow(non_upper_case_globals)]
 #[pymethods]
 impl ImageFormat {
@@ -106,6 +119,11 @@ impl ImageFormat {
     /// Implements `repr(x)` in Python.
     fn __repr__(&self) -> String {
         format!("{:?}", self.0)
+    }
+
+    /// Implements `hash(x)` in Python.
+    fn __hash__(&self) -> usize {
+        self.0 as usize
     }
 }
 

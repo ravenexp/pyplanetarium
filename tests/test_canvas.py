@@ -129,6 +129,20 @@ class CanvasCase(unittest.TestCase):
         self.assertEqual(repr(ImageFormat.RawLinear10BppLE), "RawLinear10BppLE")
         self.assertEqual(repr(ImageFormat.RawLinear12BppLE), "RawLinear12BppLE")
 
+    def test_enum_hash(self) -> None:
+        """
+        Enum variants as dict keys test
+        """
+
+        self.assertEqual(hash(ImageFormat.PngGamma8Bpp), 3)
+
+        formats = {}
+        formats[ImageFormat.PngGamma8Bpp] = "PNG8"
+        formats[ImageFormat.PngLinear16Bpp] = "PNG16"
+
+        self.assertEqual(formats[ImageFormat.PngGamma8Bpp], "PNG8")
+        self.assertEqual(formats[ImageFormat.PngLinear16Bpp], "PNG16")
+
     def test_draw_spots(self) -> None:
         """
         Light spots image drawing test
@@ -145,9 +159,11 @@ class CanvasCase(unittest.TestCase):
 
         spot1 = canvas.add_spot((100.5, 200.7), shape1, 0.8)
         self.assertIsInstance(spot1, SpotId)
+        self.assertEqual(str(spot1), "SpotId(0)")
 
         spot2 = canvas.add_spot((400.5, 600.7), shape2, 0.6)
         self.assertIsInstance(spot2, SpotId)
+        self.assertEqual(repr(spot2), "SpotId(1)")
 
         self.assertNotEqual(spot1, spot2)
 
@@ -203,6 +219,25 @@ class CanvasCase(unittest.TestCase):
         self.assertAlmostEqual(int2, 0.6 * 0.5 * 1.3, 4)
 
         canvas.draw()
+
+    def test_spot_hash(self) -> None:
+        """
+        Opaque spot identifiers as dict keys test
+        """
+
+        canvas = Canvas.new(10, 10)
+        spot1 = canvas.add_spot((1.0, 1.0), SpotShape(), 0.8)
+        spot2 = canvas.add_spot((2.0, 2.0), SpotShape(2.0), 0.6)
+
+        self.assertEqual(hash(spot1), 0)
+        self.assertEqual(hash(spot2), 1)
+
+        spots = {}
+        spots[spot1] = "Spot1"
+        spots[spot2] = "Spot2"
+
+        self.assertEqual(spots[spot1], "Spot1")
+        self.assertEqual(spots[spot2], "Spot2")
 
     def test_export_images(self) -> None:
         """
