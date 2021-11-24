@@ -25,12 +25,30 @@ use planetarium::{
 /// - `SpotShape(k)` -- the default shape scaled by factor `k`
 /// - `SpotShape((kx, ky))` -- the default shape XY stretched by `kx` and `ky` factors
 /// - `SpotShape([[xx, xy], [yx, yy]])` -- explicit transform matrix initialization
+///
+/// Example usage:
+///
+/// ```python
+/// from pyplanetarium import SpotShape
+///
+/// # Create a unit-sized circular spot.
+/// s1 = SpotShape()
+///
+/// # Upscale 2x
+/// s2 = s1.scale(2.0);
+///
+/// # Stretch by 1.5 in the X direction and rotate clockwise by 45 degrees.
+/// s3 = s2.stretch(1.5, 1.0).rotate(-45.0)
+/// ```
 #[pyclass(module = "pyplanetarium", freelist = 8)]
 struct SpotShape(RsSpotShape);
 
 /// Light spot descriptor type
 ///
 /// This class can not be instantiated by Python code.
+///
+/// `SpotId` objects are created by calling `add_spot()`
+/// method of a `Canvas` object.
 #[pyclass(module = "pyplanetarium", freelist = 8)]
 struct SpotId(RsSpotId);
 
@@ -46,14 +64,69 @@ struct SpotId(RsSpotId);
 /// - `Transform(k)` -- the scaling transform defined by a factor `k`
 /// - `Transform([[xx, xy], [yx, yy]])` -- explicit linear transform matrix initialization
 /// - `Transform([[xx, xy, sx], [yx, yy, sy]])` -- explicit affine transform matrix initialization
+///
+/// Example usage:
+///
+/// ```python
+/// from pyplanetarium import Transform
+///
+/// # Create an identity tranformation.
+/// t1 = Transform()
+///
+/// # Upscale 2x
+/// t2 = t1.scale(2.0)
+///
+/// # Stretch by 1.5 in the X direction and rotate clockwise by 45 degrees.
+/// t3 = t2.stretch(1.5, 1.0).rotate(-45.0)
+///
+/// # Translate by a vector (10, 25)
+/// t4 = t3.translate((10, 25))
+///
+/// # Compose t4 and t2 as [t2][t4]
+/// t5 = t4.compose(t2)
+/// ```
 #[pyclass(module = "pyplanetarium", freelist = 8)]
 struct Transform(RsTransform);
 
 /// Exportable canvas image formats
+///
+/// Python class wrapper for Rust `ImageFormat` enum:
+///
+///   `RawGamma8Bpp`     8-bit gamma-compressed grayscale RAW
+///
+///   `RawLinear10BppLE` 10-bit linear light grayscale little-endian RAW
+///
+///   `RawLinear12BppLE` 12-bit linear light grayscale little-endian RAW
+///
+///   `PngGamma8Bpp`     8-bit gamma-compressed grayscale PNG
+///
+///   `PngLinear16Bpp`   16-bit linear light grayscale PNG
 #[pyclass(module = "pyplanetarium", freelist = 8)]
 struct ImageFormat(RsImageFormat);
 
-/// Generates the synthesized image containing multiple light spots
+/// Opaque light spots drawing canvas object
+///
+/// Generates the synthesized image containing multiple light spots.
+///
+/// `Canvas` objects can only be created via a static constructor
+/// method `new(width, height)`.
+///
+/// Example usage:
+///
+/// ```python
+/// from pyplanetarium import Canvas
+///
+/// # Draw on a square 256x256 pixel canvas.
+/// c = Canvas.new(256, 256)
+///
+/// # Set the canvas background pixel value.
+/// c.set_background(100)
+///
+/// ...
+///
+/// # Clear the canvas and paint the light spots.
+/// c.draw()
+/// ```
 #[pyclass(module = "pyplanetarium")]
 struct Canvas(RsCanvas);
 
