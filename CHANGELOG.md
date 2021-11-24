@@ -1,6 +1,31 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.1.2] - 2021-11-24
+
+### Documentation
+
+- Expand Python class docstrings
+
+### Features
+
+- Implement `__hash__` for `SpotId` and enums
+- Add `SpotShape` helper methods
+- Add `Transform` type bindings
+- Support the view coordinate transformation
+
+### Refactor
+
+- Use `From<T>` conversions in constructors
+
+### Testing
+
+- Add `Transform` class unit tests
+
+### Build
+
+- Update `planetarium` dependency to v0.1.2
+
 ## [0.1.1] - 2021-11-18
 
 ### CI configuration
@@ -21,6 +46,7 @@ All notable changes to this project will be documented in this file.
 ### Miscellaneous Tasks
 
 - Add `git-cliff` config file
+- Add a change log file
 
 ### Testing
 
