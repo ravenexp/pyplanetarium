@@ -69,6 +69,18 @@ impl SpotShape {
         SpotShape(self.0.scale(k))
     }
 
+    /// Linearly stretches the spot shape in X and Y directions.
+    #[pyo3(text_signature = "(kx, ky, /)")]
+    fn stretch(&self, kx: f32, ky: f32) -> SpotShape {
+        SpotShape(self.0.stretch(kx, ky))
+    }
+
+    /// Rotates the spot shape counter-clockwise by `phi` degrees.
+    #[pyo3(text_signature = "(phi, /)")]
+    fn rotate(&self, phi: f32) -> SpotShape {
+        SpotShape(self.0.rotate(phi))
+    }
+
     /// Implements `str(x)` in Python.
     fn __str__(&self) -> String {
         self.0.to_string()

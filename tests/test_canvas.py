@@ -149,7 +149,7 @@ class CanvasCase(unittest.TestCase):
         """
 
         shape1 = SpotShape().scale(3.5)
-        shape2 = SpotShape().scale(5.5)
+        shape2 = SpotShape(5.5).stretch(1.5, 1.0).rotate(45)
 
         width = 1024
         height = 768
@@ -177,7 +177,7 @@ class CanvasCase(unittest.TestCase):
         """
 
         shape1 = SpotShape().scale(3.5)
-        shape2 = SpotShape().scale(5.5)
+        shape2 = SpotShape(5.5).stretch(1.0, 1.5).rotate(30)
 
         width = 1024
         height = 768
