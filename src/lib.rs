@@ -7,10 +7,11 @@ use pyo3::types::PyBytes;
 
 use pyo3::prelude::*;
 
-use planetarium::{Matrix, Pixel, Point, Vector};
+use planetarium::{Matrix, Matrix23, Pixel, Point, Vector};
 
 use planetarium::{
     Canvas as RsCanvas, ImageFormat as RsImageFormat, SpotId as RsSpotId, SpotShape as RsSpotShape,
+    Transform as RsTransform,
 };
 
 /// Spot shape definition matrix
@@ -32,6 +33,21 @@ struct SpotShape(RsSpotShape);
 /// This class can not be instantiated by Python code.
 #[pyclass(module = "pyplanetarium", freelist = 8)]
 struct SpotId(RsSpotId);
+
+/// 2D affine transformation definition matrix
+///
+/// Contains a 2x3 linear transform matrix to be applied
+/// to homogenous coordinates internally.
+///
+/// The Python objects can be created as either:
+///
+/// - `Transform()` -- the default identity transform
+/// - `Transform((sx, sy))` -- the translation transform defined by a vector `(sx, sy)`
+/// - `Transform(k)` -- the scaling transform defined by a factor `k`
+/// - `Transform([[xx, xy], [yx, yy]])` -- explicit linear transform matrix initialization
+/// - `Transform([[xx, xy, sx], [yx, yy, sy]])` -- explicit affine transform matrix initialization
+#[pyclass(module = "pyplanetarium", freelist = 8)]
+struct Transform(RsTransform);
 
 /// Exportable canvas image formats
 #[pyclass(module = "pyplanetarium", freelist = 8)]
@@ -102,6 +118,73 @@ impl SpotId {
     /// Implements `hash(x)` in Python.
     fn __hash__(&self) -> usize {
         self.0 as usize
+    }
+}
+
+#[pymethods]
+impl Transform {
+    #[new]
+    fn new(src: Option<&PyAny>) -> PyResult<Self> {
+        if let Some(src) = src {
+            if let Ok(k) = src.extract::<f32>() {
+                Ok(Transform(k.into()))
+            } else if let Ok(shift) = src.extract::<Vector>() {
+                Ok(Transform(shift.into()))
+            } else if let Ok(mat) = src.extract::<Matrix>() {
+                Ok(Transform(mat.into()))
+            } else if let Ok(mat) = src.extract::<Matrix23>() {
+                Ok(Transform(mat.into()))
+            } else {
+                Err(PyTypeError::new_err(format!(
+                    "Unexpected initializer type: '{}'",
+                    src.get_type().name().unwrap()
+                )))
+            }
+        } else {
+            Ok(Transform(RsTransform::default()))
+        }
+    }
+
+    /// Linearly translates the output coordinates by a shift vector.
+    #[pyo3(text_signature = "(shift, /)")]
+    fn translate(&self, shift: Vector) -> Transform {
+        Transform(self.0.translate(shift))
+    }
+
+    /// Linearly scales the spot shape by a single scalar factor.
+    #[pyo3(text_signature = "(k, /)")]
+    fn scale(&self, k: f32) -> Transform {
+        Transform(self.0.scale(k))
+    }
+
+    /// Linearly stretches the spot shape in X and Y directions.
+    #[pyo3(text_signature = "(kx, ky, /)")]
+    fn stretch(&self, kx: f32, ky: f32) -> Transform {
+        Transform(self.0.stretch(kx, ky))
+    }
+
+    /// Rotates the spot shape counter-clockwise by `phi` degrees.
+    #[pyo3(text_signature = "(phi, /)")]
+    fn rotate(&self, phi: f32) -> Transform {
+        Transform(self.0.rotate(phi))
+    }
+
+    /// Composes the coordinate transformation with an outer transformation.
+    ///
+    /// In the matrix multiplication form: `[t][self]`
+    #[pyo3(text_signature = "(t, /)")]
+    fn compose(&self, t: &Transform) -> Transform {
+        Transform(self.0.compose(t.0))
+    }
+
+    /// Implements `str(x)` in Python.
+    fn __str__(&self) -> String {
+        self.0.to_string()
+    }
+
+    /// Implements `repr(x)` in Python.
+    fn __repr__(&self) -> String {
+        format!("{:?}", self.0)
     }
 }
 
@@ -290,6 +373,7 @@ fn pyplanetarium(_py: Python, m: &PyModule) -> PyResult<()> {
 
     m.add_class::<SpotShape>()?;
     m.add_class::<SpotId>()?;
+    m.add_class::<Transform>()?;
     m.add_class::<ImageFormat>()?;
     m.add_class::<Canvas>()?;
 
