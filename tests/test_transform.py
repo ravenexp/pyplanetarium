@@ -125,6 +125,7 @@ class TransformCase(unittest.TestCase):
         tr7 = tr6.compose(tr4).translate((10, -10))
 
         tr8 = tr7.compose(tr3).compose(Transform())
+        self.assertIsInstance(tr8, Transform)
 
 
 if __name__ == "__main__":

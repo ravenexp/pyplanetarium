@@ -4,7 +4,7 @@ pyplanetarium package integration tests
 
 import unittest
 
-from pyplanetarium import SpotShape, SpotId, Canvas, ImageFormat
+from pyplanetarium import SpotShape, SpotId, Transform, Canvas, ImageFormat
 
 
 class CanvasCase(unittest.TestCase):
@@ -217,6 +217,63 @@ class CanvasCase(unittest.TestCase):
         assert int2 is not None
         self.assertAlmostEqual(int1, 0.8 * 1.3, 4)
         self.assertAlmostEqual(int2, 0.6 * 0.5 * 1.3, 4)
+
+        canvas.draw()
+
+    def test_view_transform(self) -> None:
+        """
+        Setting the canvas view transform test
+        """
+
+        shape1 = SpotShape([[1, -0.5], [0.5, 1.5]])
+        shape2 = SpotShape(5.5).stretch(1.0, 1.5).rotate(30)
+
+        width = 1024
+        height = 768
+
+        canvas = Canvas.new(width, height)
+        spot1 = canvas.add_spot((100.5, 200.25), shape1, 0.8)
+        spot2 = canvas.add_spot((400.5, 600.75), shape2, 0.6)
+
+        pos1 = canvas.spot_position(spot1)
+        pos2 = canvas.spot_position(spot2)
+        assert pos1 is not None
+        assert pos2 is not None
+        self.assertAlmostEqual(pos1[0], 100.5, 4)
+        self.assertAlmostEqual(pos1[1], 200.25, 4)
+        self.assertAlmostEqual(pos2[0], 400.5, 4)
+        self.assertAlmostEqual(pos2[1], 600.75, 4)
+
+        canvas.set_view_transform(Transform())
+
+        canvas.set_spot_offset(spot2, (5.5, -7.0))
+        pos2 = canvas.spot_position(spot2)
+        assert pos2 is not None
+        self.assertAlmostEqual(pos2[0], 400.5 + 5.5, 4)
+        self.assertAlmostEqual(pos2[1], 600.75 - 7.0, 4)
+
+        canvas.set_view_transform(Transform((-10, 25)))
+
+        pos1 = canvas.spot_position(spot1)
+        pos2 = canvas.spot_position(spot2)
+        assert pos1 is not None
+        assert pos2 is not None
+        self.assertAlmostEqual(pos1[0], 100.5 - 10, 4)
+        self.assertAlmostEqual(pos1[1], 200.25 + 25, 4)
+        self.assertAlmostEqual(pos2[0], 400.5 + 5.5 - 10, 4)
+        self.assertAlmostEqual(pos2[1], 600.75 - 7.0 + 25, 4)
+
+        xfrm = Transform((-100, 200)).rotate(45).compose(Transform([[-1, 0], [0, 1]]))
+
+        canvas.set_view_transform(xfrm)
+        pos1 = canvas.spot_position(spot1)
+        pos2 = canvas.spot_position(spot2)
+        assert pos1 is not None
+        assert pos2 is not None
+        self.assertAlmostEqual(pos1[0], 282.6659, 4)
+        self.assertAlmostEqual(pos1[1], 283.373, 4)
+        self.assertAlmostEqual(pos2[0], 344.8913, 4)
+        self.assertAlmostEqual(pos2[1], 777.6407, 4)
 
         canvas.draw()
 

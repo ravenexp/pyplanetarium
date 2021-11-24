@@ -300,6 +300,14 @@ impl Canvas {
         self.0.set_background(level);
     }
 
+    /// Sets the world coordinates to canvas coordinates transformation.
+    ///
+    /// The light spot coordinates are defined in the world coordinate system only.
+    #[pyo3(text_signature = "($self, transform, /)")]
+    fn set_view_transform(&mut self, transform: &Transform) {
+        self.0.set_view_transform(transform.0)
+    }
+
     /// Sets the global brightness level (light spot intensity adjustment).
     #[pyo3(text_signature = "($self, brightness, /)")]
     fn set_brightness(&mut self, brightness: f32) {
