@@ -167,7 +167,7 @@ class CanvasCase(unittest.TestCase):
 
         self.assertNotEqual(spot1, spot2)
 
-        canvas.set_background(1000)
+        canvas.set_background(int(0.1 * Canvas.PIXEL_MAX))
 
         canvas.draw()
 
@@ -203,7 +203,7 @@ class CanvasCase(unittest.TestCase):
         canvas.set_spot_offset(spot2, (5.5, -7.0))
         canvas.set_spot_illumination(spot2, 0.5)
 
-        canvas.set_background(6000)
+        canvas.set_background(int(0.2 * Canvas.PIXEL_MAX))
         canvas.set_brightness(1.3)
 
         pos2 = canvas.spot_position(spot2)

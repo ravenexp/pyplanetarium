@@ -297,6 +297,10 @@ impl ImageFormat {
 
 #[pymethods]
 impl Canvas {
+    /// `Pixel::MAX` alias
+    #[classattr]
+    const PIXEL_MAX: Pixel = Pixel::MAX;
+
     /// Creates a new clear canvas to render light spots on.
     #[staticmethod]
     #[pyo3(text_signature = "(width, height, /)")]
@@ -368,6 +372,9 @@ impl Canvas {
     }
 
     /// Sets the background light level (dark pixel value).
+    ///
+    /// The dark pixel value must be in the range
+    /// 0 to `Canvas.PIXEL_MAX` inclusive.
     #[pyo3(text_signature = "($self, level, /)")]
     fn set_background(&mut self, level: Pixel) {
         self.0.set_background(level);
@@ -435,7 +442,7 @@ impl Canvas {
 /// spot3 = c.add_spot((256.1, 3.5), shape.scale(10.0), 1.1)
 ///
 /// # Set the canvas background pixel value.
-/// c.set_background(100)
+/// c.set_background(int(0.1 * Canvas.PIXEL_MAX))
 ///
 /// # Clear the canvas and paint the light spots.
 /// c.draw()

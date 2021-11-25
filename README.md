@@ -27,7 +27,7 @@ spot2 = c.add_spot((80.6, 200.2), shape.scale(0.5), 0.9)
 spot3 = c.add_spot((256.1, 3.5), shape.scale(10.0), 1.1)
 
 # Set the canvas background pixel value.
-c.set_background(100)
+c.set_background(int(0.05 * Canvas.PIXEL_MAX))
 
 # Clear the canvas and paint the light spots.
 c.draw()
