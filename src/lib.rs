@@ -14,7 +14,7 @@ use planetarium::{Matrix, Matrix23, Pixel, Point, Vector};
 
 use planetarium::{
     Canvas as RsCanvas, ImageFormat as RsImageFormat, SpotId as RsSpotId, SpotShape as RsSpotShape,
-    Transform as RsTransform,
+    Transform as RsTransform, Window as RsWindow,
 };
 
 /// Spot shape definition matrix
@@ -90,6 +90,33 @@ struct SpotId(RsSpotId);
 /// ```
 #[pyclass(module = "pyplanetarium", freelist = 8)]
 struct Transform(RsTransform);
+
+/// Canvas image window coordinates
+///
+/// Defines a rectangular window on the canvas to export the image from.
+///
+/// The window origin is defined by its upper left corner.
+///
+/// The window object can be constructed from a nested tuple `((x, y), (w, h))`,
+/// where `(w, h)` is the window rectangle dimensions and `(x, y)` is
+/// the window origin coordinates.
+///
+/// Example usage:
+///
+/// ```python
+/// from pyplanetarium import Window
+///
+/// # Create a new 128x64 window with origin at (100, 200).
+/// wnd1 = Window(((100, 200), (128, 64)));
+///
+/// # Create a new rectangular window with origin at (0, 0).
+/// wnd2 = Window.new(128, 64);
+///
+/// # Move the window origin to (250, 150).
+/// wnd3 = wnd2.at(250, 150);
+/// ```
+#[pyclass(module = "pyplanetarium", freelist = 8)]
+struct Window(RsWindow);
 
 /// Exportable canvas image formats
 ///
@@ -251,6 +278,37 @@ impl Transform {
     #[pyo3(text_signature = "(t, /)")]
     fn compose(&self, t: &Transform) -> Transform {
         Transform(self.0.compose(t.0))
+    }
+
+    /// Implements `str(x)` in Python.
+    fn __str__(&self) -> String {
+        self.0.to_string()
+    }
+
+    /// Implements `repr(x)` in Python.
+    fn __repr__(&self) -> String {
+        format!("{:?}", self.0)
+    }
+}
+
+#[pymethods]
+impl Window {
+    #[new]
+    fn new_(src: ((u32, u32), (u32, u32))) -> Self {
+        Window(src.into())
+    }
+
+    /// Creates a new window with given dimensions located at the origin.
+    #[staticmethod]
+    #[pyo3(text_signature = "(width, height, /)")]
+    fn new(width: u32, height: u32) -> Self {
+        Window(RsWindow::new(width, height))
+    }
+
+    /// Moves the window origin to the given origin coordinates.
+    #[pyo3(text_signature = "(x, y, /)")]
+    fn at(&self, x: u32, y: u32) -> Window {
+        Window(self.0.at(x, y))
     }
 
     /// Implements `str(x)` in Python.
@@ -465,6 +523,7 @@ fn pyplanetarium(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<SpotShape>()?;
     m.add_class::<SpotId>()?;
     m.add_class::<Transform>()?;
+    m.add_class::<Window>()?;
     m.add_class::<ImageFormat>()?;
     m.add_class::<Canvas>()?;
 
