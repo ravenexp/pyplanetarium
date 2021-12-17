@@ -2,6 +2,9 @@
 //!
 //! The Python bindings are implemented entirely in Rust using PyO3.
 
+// FIXME: Add a workaround for rustc-1.57 and pyo3-0.15.1 combination.
+#![allow(clippy::needless_option_as_deref)]
+
 use pyo3::exceptions::{PyNotImplementedError, PyTypeError};
 use pyo3::types::PyBytes;
 
