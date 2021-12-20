@@ -48,7 +48,7 @@ fmt:
 clippy:
     stage: check
     script:
-      - cargo clippy
+      - cargo clippy -- --deny warnings
 
 compile:
     stage: build
