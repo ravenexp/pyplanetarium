@@ -1,6 +1,35 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.1.3] - 2021-12-20
+
+### Bug Fixes
+
+- Fix spurious clippy warnings for rust v1.57
+- Update setuptools for pylint runs
+
+### CI configuration
+
+- Fail the clippy check on warnings
+
+### Documentation
+
+- Add window image export examples
+
+### Features
+
+- Add `Canvas.PIXEL_MAX` class attribute
+- Add `Window` type bindings
+- Add `export_window_image()` method binding
+
+### Refactor
+
+- Extract `SpotShape` tests into a module
+
+### Build
+
+- Update Planetarium to v0.1.3
+
 ## [0.1.2] - 2021-11-24
 
 ### Documentation
