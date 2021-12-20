@@ -4,7 +4,7 @@ pyplanetarium package integration tests
 
 import unittest
 
-from pyplanetarium import SpotShape, SpotId, Transform, Canvas, ImageFormat
+from pyplanetarium import SpotShape, SpotId, Transform, Canvas, ImageFormat, Window
 
 
 class CanvasCase(unittest.TestCase):
@@ -285,6 +285,51 @@ class CanvasCase(unittest.TestCase):
 
         # with open("image16.png", "wb") as f:
         #     f.write(png16_bytes)
+
+    def test_export_window_images(self) -> None:
+        """
+        Windowed canvas image export test
+        """
+
+        shape1 = SpotShape().scale(3.5)
+        shape2 = SpotShape().scale(5.5)
+
+        width = 256
+        height = 256
+
+        canvas = Canvas.new(width, height)
+
+        spot1 = canvas.add_spot((180.5, 150.7), shape1, 0.8)
+        spot2 = canvas.add_spot((100.5, 110.7), shape2, 0.6)
+
+        self.assertNotEqual(spot1, spot2)
+
+        canvas.set_background(5000)
+
+        canvas.draw()
+
+        wnd1 = Window.new(32, 16).at(170, 140)
+        wnd2 = Window.new(32, 16).at(90, 100)
+
+        raw8_bytes = canvas.export_window_image(wnd1, ImageFormat.RawGamma8Bpp)
+        self.assertIsInstance(raw8_bytes, bytes)
+        self.assertEqual(len(raw8_bytes), 32 * 16)
+
+        raw10_bytes = canvas.export_window_image(wnd1, ImageFormat.RawLinear10BppLE)
+        self.assertIsInstance(raw10_bytes, bytes)
+        self.assertEqual(len(raw10_bytes), 2 * 32 * 16)
+
+        raw12_bytes = canvas.export_window_image(wnd2, ImageFormat.RawLinear12BppLE)
+        self.assertIsInstance(raw12_bytes, bytes)
+        self.assertEqual(len(raw12_bytes), 2 * 32 * 16)
+
+        png8_bytes = canvas.export_window_image(wnd1, ImageFormat.PngGamma8Bpp)
+        self.assertIsInstance(png8_bytes, bytes)
+        self.assertEqual(len(png8_bytes), 250)
+
+        png16_bytes = canvas.export_window_image(wnd2, ImageFormat.PngLinear16Bpp)
+        self.assertIsInstance(png16_bytes, bytes)
+        self.assertEqual(len(png16_bytes), 664)
 
 
 if __name__ == "__main__":

@@ -5,12 +5,12 @@
 // FIXME: Add a workaround for rustc-1.57 and pyo3-0.15.1 combination.
 #![allow(clippy::needless_option_as_deref)]
 
-use pyo3::exceptions::{PyNotImplementedError, PyTypeError};
+use pyo3::exceptions::{PyNotImplementedError, PyTypeError, PyValueError};
 use pyo3::types::PyBytes;
 
 use pyo3::prelude::*;
 
-use planetarium::{Matrix, Matrix23, Pixel, Point, Vector};
+use planetarium::{EncoderError, Matrix, Matrix23, Pixel, Point, Vector};
 
 use planetarium::{
     Canvas as RsCanvas, ImageFormat as RsImageFormat, SpotId as RsSpotId, SpotShape as RsSpotShape,
@@ -356,6 +356,14 @@ impl ImageFormat {
     }
 }
 
+/// Converts `EncoderError` to Python exceptions.
+fn my_to_pyerr(err: EncoderError) -> PyErr {
+    match err {
+        EncoderError::BrokenWindow => PyValueError::new_err("window is out of bounds".to_string()),
+        _ => PyNotImplementedError::new_err(err.to_string()),
+    }
+}
+
 #[pymethods]
 impl Canvas {
     /// `Pixel::MAX` alias
@@ -460,7 +468,21 @@ impl Canvas {
     fn export_image(&self, format: &ImageFormat, py: Python) -> PyResult<Py<PyBytes>> {
         match self.0.export_image(format.0) {
             Ok(b) => Ok(PyBytes::new(py, b.as_slice()).into()),
-            Err(e) => Err(PyNotImplementedError::new_err(e.to_string())),
+            Err(e) => Err(my_to_pyerr(e)),
+        }
+    }
+
+    /// Exports the canvas window contents in the requested image format.
+    #[pyo3(text_signature = "($self, window, format, /)")]
+    fn export_window_image(
+        &self,
+        window: &Window,
+        format: &ImageFormat,
+        py: Python,
+    ) -> PyResult<Py<PyBytes>> {
+        match self.0.export_window_image(window.0, format.0) {
+            Ok(b) => Ok(PyBytes::new(py, b.as_slice()).into()),
+            Err(e) => Err(my_to_pyerr(e)),
         }
     }
 
