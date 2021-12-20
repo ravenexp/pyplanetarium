@@ -124,6 +124,7 @@ typecheck:
       - python3 -m venv --system-site-packages mypy_venv
       - . mypy_venv/bin/activate
       - maturin develop
+      - python3 -m pip install -U setuptools --index-url "${PLG_CI_PYPI_INDEX_URL}"
       - python3 -m pylint --extension-pkg-whitelist="${CI_PROJECT_NAME}" tests
       - python3 -m mypy tests
 
