@@ -8,7 +8,7 @@ Example usage
 -------------
 
 ```python
-from pyplanetarium import Canvas, SpotShape, ImageFormat
+from pyplanetarium import Canvas, SpotShape, ImageFormat, Window
 
 # Draw on a square 256x256 pixel canvas.
 c = Canvas.new(256, 256)
@@ -37,4 +37,8 @@ png_8bpp_bytes = c.export_image(ImageFormat.PngGamma8Bpp)
 
 # Export to a 16-bit linear light grayscale PNG image.
 png_16bpp_bytes = c.export_image(ImageFormat.PngLinear16Bpp)
+
+# Export a rectangular canvas window to a 8-bit gamma-compressed RAW image.
+wnd = Window.new(64, 32).at(90, 120)
+raw_window_8bpp_bytes = c.export_window_image(wnd, ImageFormat.PngGamma8Bpp)
 ```
