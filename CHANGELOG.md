@@ -1,6 +1,16 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.1.4] - 2022-03-03
+
+### Features
+
+- Add subsampled canvas image export method
+
+### Build
+
+- Use `python3-dll-a` crate to target Windows
+
 ## [0.1.3] - 2021-12-20
 
 ### Bug Fixes
