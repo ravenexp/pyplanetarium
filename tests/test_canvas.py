@@ -331,6 +331,40 @@ class CanvasCase(unittest.TestCase):
         self.assertIsInstance(png16_bytes, bytes)
         self.assertEqual(len(png16_bytes), 664)
 
+    def test_export_subsampled_images(self) -> None:
+        """
+        Subsampled canvas image export test
+        """
+
+        shape1 = SpotShape().scale(3.5)
+        shape2 = SpotShape().scale(5.5)
+
+        width = 256
+        height = 256
+
+        canvas = Canvas.new(width, height)
+
+        spot1 = canvas.add_spot((180.5, 150.7), shape1, 0.8)
+        spot2 = canvas.add_spot((100.5, 110.7), shape2, 0.6)
+
+        self.assertNotEqual(spot1, spot2)
+
+        canvas.set_background(5000)
+
+        canvas.draw()
+
+        raw10_bytes = canvas.export_subsampled_image(
+            (2, 2), ImageFormat.RawLinear10BppLE
+        )
+        self.assertIsInstance(raw10_bytes, bytes)
+        self.assertEqual(len(raw10_bytes), 2 * 128 * 128)
+
+        raw12_bytes = canvas.export_subsampled_image(
+            (4, 4), ImageFormat.RawLinear12BppLE
+        )
+        self.assertIsInstance(raw12_bytes, bytes)
+        self.assertEqual(len(raw12_bytes), 2 * 64 * 64)
+
 
 if __name__ == "__main__":
     unittest.main()

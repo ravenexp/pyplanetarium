@@ -486,6 +486,23 @@ impl Canvas {
         }
     }
 
+    /// Exports the subsampled canvas image in the requested image format.
+    ///
+    /// The integer subsampling factors in X and Y directions
+    /// are passed in `factors`.
+    #[pyo3(text_signature = "($self, format, /)")]
+    fn export_subsampled_image(
+        &self,
+        factors: (u32, u32),
+        format: &ImageFormat,
+        py: Python,
+    ) -> PyResult<Py<PyBytes>> {
+        match self.0.export_subsampled_image(factors, format.0) {
+            Ok(b) => Ok(PyBytes::new(py, b.as_slice()).into()),
+            Err(e) => Err(my_to_pyerr(e)),
+        }
+    }
+
     /// Implements `repr(x)` in Python.
     fn __repr__(&self) -> String {
         let (w, h) = self.0.dimensions();
