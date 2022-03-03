@@ -1,7 +1,6 @@
 variables:
     CARGO_HOME: "${CI_PROJECT_DIR}/cargo"
     RELEASE_NAME: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_SLUG}-g${CI_COMMIT_SHORT_SHA}-b${CI_PIPELINE_ID}"
-    SITE_DIR: "doc"
     TEST_PYPI_SERVER: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi"
     TEST_PYPI_USER: "gitlab-ci-token"
     TEST_PYPI_PASSWORD: "${CI_JOB_TOKEN}"
@@ -65,8 +64,7 @@ compile:
 compile-win64:
     stage: build
     script:
-      - . windows/cross-build-env.sh
-      - cargo build --release
+      - PYO3_CROSS_LIB_DIR=target/python3-dll cargo build --release --target x86_64-pc-windows-gnu
       - mkdir -p dist
       - cp "target/x86_64-pc-windows-gnu/release/${CI_PROJECT_NAME}.dll" "dist/${CI_PROJECT_NAME}.pyd"
       - x86_64-w64-mingw32-strip "dist/${CI_PROJECT_NAME}.pyd"
@@ -81,11 +79,11 @@ docs:
       - python3 -m venv --system-site-packages pdoc_venv
       - . pdoc_venv/bin/activate
       - maturin develop
-      - python3 -m pdoc -o html "${CI_PROJECT_NAME}"
+      - python3 -m pdoc -o target/pdoc "${CI_PROJECT_NAME}"
     artifacts:
         name: "${RELEASE_NAME}-docs"
         paths:
-          - html
+          - target/pdoc
 
 package:
     stage: wheels
@@ -100,8 +98,7 @@ package:
 package-win64:
     stage: wheels
     script:
-      - . windows/cross-build-env.sh
-      - maturin build --release --strip --target x86_64-pc-windows-gnu
+      - PYO3_CROSS_LIB_DIR=target/python3-dll maturin build --release --strip --target x86_64-pc-windows-gnu
       - cp -t dist target/wheels/*.whl
     artifacts:
         name: "${RELEASE_NAME}-wheel-win64"
@@ -179,3 +176,9 @@ include:
   - project: 'devops/support'
     ref: master
     file: 'includes/artifacts/deploy-site.yml'
+
+deploy-site:
+    variables:
+        DEPLOY_DIR: "target/pdoc"
+        DEPLOY_STRATEGY: "custom"
+        DEPLOY_PATH: "$CI_COMMIT_REF_NAME"
