@@ -18,4 +18,4 @@ pyo3 = { version = "0.16", features = ["extension-module", "abi3-py37"] }
 planetarium = "0.1"
 
 [build-dependencies]
-python3-dll-a = "0.1"
+python3-dll-a = "0.2"
