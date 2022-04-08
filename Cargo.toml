@@ -19,3 +19,7 @@ planetarium = "0.1"
 
 [build-dependencies]
 python3-dll-a = "0.2"
+
+[profile.release]
+lto = true
+strip = true
