@@ -6,9 +6,8 @@
 .tox
 __pycache__
 
-# Vim tags
-tags
-
 # GitLab CI stuff
-/.cargo
-/cargo
+/.cargo/
+/cargo/
+/mypy_venv/
+/pdoc_venv/

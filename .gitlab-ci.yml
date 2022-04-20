@@ -7,7 +7,8 @@ include:
     file:
       - "includes/variables/pypi-gitlab.yml"
       - "includes/build/rust/crates-io-mirror.yml"
-      - "includes/artifacts/deploy-site.yml"
+      - "includes/reports/pytest-junit.yml"
+      - "includes/docs/python-pdoc.yml"
 
 default:
     tags:
@@ -55,18 +56,6 @@ compile-win64:
         paths:
           - dist
 
-docs:
-    stage: build
-    script:
-      - python3 -m venv --system-site-packages pdoc_venv
-      - . pdoc_venv/bin/activate
-      - maturin develop
-      - python3 -m pdoc -o target/pdoc "${CI_PROJECT_NAME}"
-    artifacts:
-        name: "${RELEASE_NAME}-docs"
-        paths:
-          - target/pdoc
-
 package:
     stage: wheels
     script:
@@ -103,19 +92,15 @@ typecheck:
       - python3 -m venv --system-site-packages mypy_venv
       - . mypy_venv/bin/activate
       - maturin develop
-      - python3 -m pip install -U setuptools --index-url "${PLG_CI_PYPI_INDEX_URL}"
-      - python3 -m pylint --extension-pkg-whitelist="${CI_PROJECT_NAME}" tests
+      - python3 -m pylint tests
       - python3 -m mypy tests
 
 runtests:
     stage: test
+    variables:
+        PIP_INDEX_URL: "${PLG_CI_PYPI_INDEX_URL}"
     script:
-      - tox --index-url "${PLG_CI_PYPI_INDEX_URL}"
-      - python3 -m venv --system-site-packages test_venv
-      - . test_venv/bin/activate
-      - maturin develop
-      - python3 -m unittest --verbose
-      - python3 -m pytest --verbose
+      - tox
 
 pubtest:
     stage: publish-test
@@ -153,9 +138,3 @@ publish-wheels:
       - tags
     script:
       - maturin upload -r "${PLG_CI_PYPI_SERVER}" -u "${PLG_CI_PYPI_USER}" -p "${PLG_CI_PYPI_PASSWORD}" dist/*.whl dist/*.tar.gz
-
-deploy-site:
-    variables:
-        DEPLOY_DIR: "target/pdoc"
-        DEPLOY_STRATEGY: "custom"
-        DEPLOY_PATH: "$CI_COMMIT_REF_NAME"
