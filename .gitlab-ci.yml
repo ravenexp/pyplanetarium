@@ -47,7 +47,7 @@ compile:
 compile-win64:
     stage: build
     script:
-      - PYO3_CROSS_LIB_DIR=target/python3-dll cargo build --release --target x86_64-pc-windows-gnu
+      - cargo build --release --target x86_64-pc-windows-gnu
       - mkdir -p dist
       - cp "target/x86_64-pc-windows-gnu/release/${CI_PROJECT_NAME}.dll" "dist/${CI_PROJECT_NAME}.pyd"
     artifacts:
@@ -80,7 +80,7 @@ package:
 package-win64:
     stage: wheels
     script:
-      - PYO3_CROSS_LIB_DIR=target/python3-dll maturin build --release --strip --target x86_64-pc-windows-gnu
+      - maturin build -i python3 --release --target x86_64-pc-windows-gnu
       - cp -t dist target/wheels/*.whl
     artifacts:
         name: "${RELEASE_NAME}-wheel-win64"
