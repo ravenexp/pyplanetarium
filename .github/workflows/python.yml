@@ -23,3 +23,16 @@ jobs:
       run: pip install tox
     - name: Run tox
       run: tox
+  typechecks:
+    name: Mypy (pylint) test checks
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run mypy and pylint checks
+      run: |
+        python3 -m venv mypy_venv
+        . mypy_venv/bin/activate
+        pip install maturin mypy pylint
+        maturin develop
+        python -m mypy tests
+        python -m pylint tests
