@@ -1,0 +1,29 @@
+name: Build Python wheels
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  wheels:
+    name: Build Python wheels
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: messense/maturin-action@v1
+      with:
+        args: --release
+        manylinux: 2010
+    - name: Install cross-compilers and maturin
+      run: |
+        sudo apt-get install -y gcc-mingw-w64-x86-64
+        rustup target add x86_64-pc-windows-gnu
+        pip3 install maturin
+    - name: Build 64-bit Windows wheels
+      run: maturin build --no-sdist --release --target x86_64-pc-windows-gnu
+    - uses: actions/upload-artifact@v3
+      with:
+        name: wheels
+        path: target/wheels
