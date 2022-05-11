@@ -2,9 +2,6 @@
 //!
 //! The Python bindings are implemented entirely in Rust using PyO3.
 
-// FIXME: Add a workaround for rustc-1.57 and pyo3-0.15.1 combination.
-#![allow(clippy::needless_option_as_deref)]
-
 use pyo3::exceptions::{PyNotImplementedError, PyTypeError, PyValueError};
 use pyo3::types::PyBytes;
 
@@ -555,7 +552,11 @@ impl Canvas {
 ///
 /// # Export a rectangular canvas window to a 8-bit gamma-compressed RAW image.
 /// wnd = Window.new(64, 32).at(90, 120)
-/// raw_window_8bpp_bytes = c.export_window_image(wnd, ImageFormat.PngGamma8Bpp)
+/// raw_window_8bpp_bytes = c.export_window_image(wnd, ImageFormat.RawGamma8Bpp)
+///
+/// # Export the 2x2 subsampled canvas frame to a 10-bit linear light RAW image.
+/// factors = (2, 2)
+/// raw_subsampled_10bpp_bytes = c.export_subsampled_image(factors, ImageFormat.RawLinear10BppLE)
 /// ```
 #[pymodule]
 fn pyplanetarium(_py: Python, m: &PyModule) -> PyResult<()> {

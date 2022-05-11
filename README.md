@@ -40,5 +40,9 @@ png_16bpp_bytes = c.export_image(ImageFormat.PngLinear16Bpp)
 
 # Export a rectangular canvas window to a 8-bit gamma-compressed RAW image.
 wnd = Window.new(64, 32).at(90, 120)
-raw_window_8bpp_bytes = c.export_window_image(wnd, ImageFormat.PngGamma8Bpp)
+raw_window_8bpp_bytes = c.export_window_image(wnd, ImageFormat.RawGamma8Bpp)
+
+# Export the 2x2 subsampled canvas frame to a 10-bit linear light RAW image.
+factors = (2, 2)
+raw_subsampled_10bpp_bytes = c.export_subsampled_image(factors, ImageFormat.RawLinear10BppLE)
 ```
