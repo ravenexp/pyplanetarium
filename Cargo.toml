@@ -14,8 +14,8 @@ readme = "README.md"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { version = "0.16", features = ["extension-module", "abi3-py37", "generate-abi3-import-lib"] }
-planetarium = "0.1"
+pyo3 = { version = "0.16.4", features = ["extension-module", "abi3-py37", "generate-abi3-import-lib"] }
+planetarium = "0.1.5"
 
 [profile.release]
 lto = true

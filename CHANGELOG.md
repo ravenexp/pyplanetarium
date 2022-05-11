@@ -1,6 +1,39 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.1.5] - 2022-05-11
+
+### CI configuration
+
+- Update and simplify GitLab CI config
+- Use more GitLab instance-wide includes
+- Add `rust.yml` workflow
+- Add `python.yml` workflow
+- Lint and typecheck Python tests
+- Add `publish.yml` workflow
+- Add `wheels.yml` workflow
+- Upload Python wheels to PyPI in `publish.yml`
+
+### Documentation
+
+- Add subsampled canvas image export examples
+
+### Miscellaneous Tasks
+
+- Add pylintrc config file
+
+### Testing
+
+- Export subsampled images in all formats
+
+### Build
+
+- Upgrade the PyO3 dependency to v0.16
+- Upgrade `python3-dll-a` dependency to v0.2
+- Upgrade the PyO3 dependency to v0.16.3
+- Upgrade the PyO3 dependency to v0.16.4
+- Upgrade to planetarium v0.1.5
+
 ## [0.1.4] - 2022-03-03
 
 ### Features
