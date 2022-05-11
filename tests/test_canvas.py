@@ -353,6 +353,10 @@ class CanvasCase(unittest.TestCase):
 
         canvas.draw()
 
+        raw8_bytes = canvas.export_subsampled_image((2, 2), ImageFormat.RawGamma8Bpp)
+        self.assertIsInstance(raw8_bytes, bytes)
+        self.assertEqual(len(raw8_bytes), 128 * 128)
+
         raw10_bytes = canvas.export_subsampled_image(
             (2, 2), ImageFormat.RawLinear10BppLE
         )
@@ -364,6 +368,14 @@ class CanvasCase(unittest.TestCase):
         )
         self.assertIsInstance(raw12_bytes, bytes)
         self.assertEqual(len(raw12_bytes), 2 * 64 * 64)
+
+        png8_bytes = canvas.export_subsampled_image((2, 2), ImageFormat.PngGamma8Bpp)
+        self.assertIsInstance(png8_bytes, bytes)
+        self.assertEqual(len(png8_bytes), 366)
+
+        png16_bytes = canvas.export_subsampled_image((4, 4), ImageFormat.PngLinear16Bpp)
+        self.assertIsInstance(png16_bytes, bytes)
+        self.assertEqual(len(png16_bytes), 284)
 
 
 if __name__ == "__main__":
