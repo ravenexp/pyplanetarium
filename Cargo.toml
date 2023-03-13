@@ -1,6 +1,6 @@
 [package]
 name = "pyplanetarium"
-version = "0.1.5"
+version = "0.1.6"
 description = "Python bindings for Rust Planetarium rendering library"
 repository = "https://github.com/ravenexp/pyplanetarium"
 authors = ["Sergey Kvachonok <ravenexp@gmail.com>"]
@@ -15,7 +15,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = { version = "0.16.4", features = ["extension-module", "abi3-py37", "generate-abi3-import-lib"] }
-planetarium = "0.1.5"
+planetarium = "0.1.6"
 
 [profile.release]
 lto = true

@@ -265,11 +265,11 @@ class CanvasCase(unittest.TestCase):
 
         png8_bytes = canvas.export_image(ImageFormat.PngGamma8Bpp)
         self.assertIsInstance(png8_bytes, bytes)
-        self.assertEqual(len(png8_bytes), 949)
+        self.assertEqual(len(png8_bytes), 1283)
 
         png16_bytes = canvas.export_image(ImageFormat.PngLinear16Bpp)
         self.assertIsInstance(png16_bytes, bytes)
-        self.assertEqual(len(png16_bytes), 1816)
+        self.assertEqual(len(png16_bytes), 2737)
 
         # with open("image8.raw", "wb") as f:
         #     f.write(raw8_bytes)
@@ -325,11 +325,11 @@ class CanvasCase(unittest.TestCase):
 
         png8_bytes = canvas.export_window_image(wnd1, ImageFormat.PngGamma8Bpp)
         self.assertIsInstance(png8_bytes, bytes)
-        self.assertEqual(len(png8_bytes), 250)
+        self.assertEqual(len(png8_bytes), 254)
 
         png16_bytes = canvas.export_window_image(wnd2, ImageFormat.PngLinear16Bpp)
         self.assertIsInstance(png16_bytes, bytes)
-        self.assertEqual(len(png16_bytes), 664)
+        self.assertEqual(len(png16_bytes), 667)
 
     def test_export_subsampled_images(self) -> None:
         """
@@ -371,11 +371,11 @@ class CanvasCase(unittest.TestCase):
 
         png8_bytes = canvas.export_subsampled_image((2, 2), ImageFormat.PngGamma8Bpp)
         self.assertIsInstance(png8_bytes, bytes)
-        self.assertEqual(len(png8_bytes), 366)
+        self.assertEqual(len(png8_bytes), 425)
 
         png16_bytes = canvas.export_subsampled_image((4, 4), ImageFormat.PngLinear16Bpp)
         self.assertIsInstance(png16_bytes, bytes)
-        self.assertEqual(len(png16_bytes), 284)
+        self.assertEqual(len(png16_bytes), 311)
 
 
 if __name__ == "__main__":

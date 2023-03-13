@@ -217,7 +217,7 @@ impl SpotId {
 
     /// Implements `hash(x)` in Python.
     fn __hash__(&self) -> usize {
-        self.0 as usize
+        self.0
     }
 }
 
