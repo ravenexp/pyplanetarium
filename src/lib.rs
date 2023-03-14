@@ -180,19 +180,16 @@ impl SpotShape {
     }
 
     /// Linearly scales the spot shape by a single scalar factor.
-    #[pyo3(text_signature = "(k, /)")]
     fn scale(&self, k: f32) -> SpotShape {
         SpotShape(self.0.scale(k))
     }
 
     /// Linearly stretches the spot shape in X and Y directions.
-    #[pyo3(text_signature = "(kx, ky, /)")]
     fn stretch(&self, kx: f32, ky: f32) -> SpotShape {
         SpotShape(self.0.stretch(kx, ky))
     }
 
     /// Rotates the spot shape counter-clockwise by `phi` degrees.
-    #[pyo3(text_signature = "(phi, /)")]
     fn rotate(&self, phi: f32) -> SpotShape {
         SpotShape(self.0.rotate(phi))
     }
@@ -246,25 +243,21 @@ impl Transform {
     }
 
     /// Linearly translates the output coordinates by a shift vector.
-    #[pyo3(text_signature = "(shift, /)")]
     fn translate(&self, shift: Vector) -> Transform {
         Transform(self.0.translate(shift))
     }
 
     /// Linearly scales the spot shape by a single scalar factor.
-    #[pyo3(text_signature = "(k, /)")]
     fn scale(&self, k: f32) -> Transform {
         Transform(self.0.scale(k))
     }
 
     /// Linearly stretches the spot shape in X and Y directions.
-    #[pyo3(text_signature = "(kx, ky, /)")]
     fn stretch(&self, kx: f32, ky: f32) -> Transform {
         Transform(self.0.stretch(kx, ky))
     }
 
     /// Rotates the spot shape counter-clockwise by `phi` degrees.
-    #[pyo3(text_signature = "(phi, /)")]
     fn rotate(&self, phi: f32) -> Transform {
         Transform(self.0.rotate(phi))
     }
@@ -272,7 +265,6 @@ impl Transform {
     /// Composes the coordinate transformation with an outer transformation.
     ///
     /// In the matrix multiplication form: `[t][self]`
-    #[pyo3(text_signature = "(t, /)")]
     fn compose(&self, t: &Transform) -> Transform {
         Transform(self.0.compose(t.0))
     }
@@ -297,13 +289,11 @@ impl Window {
 
     /// Creates a new window with given dimensions located at the origin.
     #[staticmethod]
-    #[pyo3(text_signature = "(width, height, /)")]
     fn new(width: u32, height: u32) -> Self {
         Window(RsWindow::new(width, height))
     }
 
     /// Moves the window origin to the given origin coordinates.
-    #[pyo3(text_signature = "(x, y, /)")]
     fn at(&self, x: u32, y: u32) -> Window {
         Window(self.0.at(x, y))
     }
@@ -369,13 +359,11 @@ impl Canvas {
 
     /// Creates a new clear canvas to render light spots on.
     #[staticmethod]
-    #[pyo3(text_signature = "(width, height, /)")]
     fn new(width: u32, height: u32) -> Self {
         Canvas(RsCanvas::new(width, height))
     }
 
     /// Creates a new light spot on the canvas.
-    #[pyo3(text_signature = "($self, position, shape, intensity, /)")]
     fn add_spot(&mut self, position: Point, shape: &SpotShape, intensity: f32) -> SpotId {
         let id = self.0.add_spot(position, shape.0, intensity);
         SpotId(id)
@@ -386,7 +374,6 @@ impl Canvas {
     /// The canvas coordinates are calculated as the immutable spot position coordinates
     /// shifted by the variable spot offset vector and transformed using the canvas
     /// world transform.
-    #[pyo3(text_signature = "($self, spot, /)")]
     fn spot_position(&self, spot: &SpotId) -> Option<Point> {
         self.0.spot_position(spot.0)
     }
@@ -396,7 +383,6 @@ impl Canvas {
     /// The effective peak intensity is calculated as the product of the immutable spot
     /// intensity factor, the variable spot illumination factor
     /// and the global brightness level.
-    #[pyo3(text_signature = "($self, spot, /)")]
     fn spot_intensity(&self, spot: &SpotId) -> Option<f32> {
         self.0.spot_intensity(spot.0)
     }
@@ -405,7 +391,6 @@ impl Canvas {
     ///
     /// The position offset vector is added to the immutable spot position
     /// to calculate the spot rendering coordinates on the canvas.
-    #[pyo3(text_signature = "($self, spot, offset, /)")]
     fn set_spot_offset(&mut self, spot: &SpotId, offset: Vector) {
         self.0.set_spot_offset(spot.0, offset)
     }
@@ -414,25 +399,21 @@ impl Canvas {
     ///
     /// The spot illumination factor is multiplied with the immutable spot
     /// intensity factor to calculate the rendered peak intensity.
-    #[pyo3(text_signature = "($self, spot, illumination, /)")]
     fn set_spot_illumination(&mut self, spot: &SpotId, illumination: f32) {
         self.0.set_spot_illumination(spot.0, illumination)
     }
 
     /// Clears the canvas image (fills with background pixels).
-    #[pyo3(text_signature = "($self, /)")]
     fn clear(&mut self) {
         self.0.clear()
     }
 
     /// Draws the light spots onto the canvas image.
-    #[pyo3(text_signature = "($self, /)")]
     fn draw(&mut self) {
         self.0.draw();
     }
 
     /// Returns the canvas dimensions as `(width, height)`.
-    #[pyo3(text_signature = "($self, /)")]
     fn dimensions(&self) -> (u32, u32) {
         self.0.dimensions()
     }
@@ -441,7 +422,6 @@ impl Canvas {
     ///
     /// The dark pixel value must be in the range
     /// 0 to `Canvas.PIXEL_MAX` inclusive.
-    #[pyo3(text_signature = "($self, level, /)")]
     fn set_background(&mut self, level: Pixel) {
         self.0.set_background(level);
     }
@@ -449,19 +429,16 @@ impl Canvas {
     /// Sets the world coordinates to canvas coordinates transformation.
     ///
     /// The light spot coordinates are defined in the world coordinate system only.
-    #[pyo3(text_signature = "($self, transform, /)")]
     fn set_view_transform(&mut self, transform: &Transform) {
         self.0.set_view_transform(transform.0)
     }
 
     /// Sets the global brightness level (light spot intensity adjustment).
-    #[pyo3(text_signature = "($self, brightness, /)")]
     fn set_brightness(&mut self, brightness: f32) {
         self.0.set_brightness(brightness);
     }
 
     /// Exports the canvas contents in the requested image format.
-    #[pyo3(text_signature = "($self, format, /)")]
     fn export_image(&self, format: &ImageFormat, py: Python) -> PyResult<Py<PyBytes>> {
         match self.0.export_image(format.0) {
             Ok(b) => Ok(PyBytes::new(py, b.as_slice()).into()),
@@ -470,7 +447,6 @@ impl Canvas {
     }
 
     /// Exports the canvas window contents in the requested image format.
-    #[pyo3(text_signature = "($self, window, format, /)")]
     fn export_window_image(
         &self,
         window: &Window,
@@ -487,7 +463,6 @@ impl Canvas {
     ///
     /// The integer subsampling factors in X and Y directions
     /// are passed in `factors`.
-    #[pyo3(text_signature = "($self, format, /)")]
     fn export_subsampled_image(
         &self,
         factors: (u32, u32),
