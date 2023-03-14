@@ -377,6 +377,29 @@ class CanvasCase(unittest.TestCase):
         self.assertIsInstance(png16_bytes, bytes)
         self.assertEqual(len(png16_bytes), 311)
 
+    def test_export_window_error(self) -> None:
+        """
+        Windowed canvas image export error test
+        """
+
+        canvas = Canvas.new(256, 256)
+        bad_wnd = Window.new(100, 100).at(170, 140)
+
+        with self.assertRaises(ValueError):
+            canvas.export_window_image(bad_wnd, ImageFormat.RawGamma8Bpp)
+
+    def test_export_subsampled_error(self) -> None:
+        """
+        Subsampled canvas image export error test
+        """
+
+        canvas = Canvas.new(256, 256)
+
+        bad_factors = 0, 30
+
+        with self.assertRaises(ValueError):
+            canvas.export_subsampled_image(bad_factors, ImageFormat.RawGamma8Bpp)
+
 
 if __name__ == "__main__":
     unittest.main()

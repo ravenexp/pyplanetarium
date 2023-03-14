@@ -347,6 +347,9 @@ impl ImageFormat {
 fn my_to_pyerr(err: EncoderError) -> PyErr {
     match err {
         EncoderError::BrokenWindow => PyValueError::new_err("window is out of bounds".to_string()),
+        EncoderError::InvalidSubsamplingRate => {
+            PyValueError::new_err("bad subsampling factors".to_string())
+        }
         _ => PyNotImplementedError::new_err(err.to_string()),
     }
 }
