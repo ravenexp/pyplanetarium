@@ -34,32 +34,34 @@ clippy:
     script:
       - cargo clippy -- --deny warnings
 
+black:
+    stage: check
+    script:
+      - black --check tests
+
 compile:
     stage: build
     script:
       - cargo build --release
-      - mkdir -p dist
-      - cp "target/release/lib${CI_PROJECT_NAME}.so" "dist/${CI_PROJECT_NAME}.so"
     artifacts:
         name: "${RELEASE_NAME}-bin-lin64"
         paths:
-          - dist
+          - target/release/*.so
 
 compile-win64:
     stage: build
     script:
       - cargo build --release --target x86_64-pc-windows-gnu
-      - mkdir -p dist
-      - cp "target/x86_64-pc-windows-gnu/release/${CI_PROJECT_NAME}.dll" "dist/${CI_PROJECT_NAME}.pyd"
     artifacts:
         name: "${RELEASE_NAME}-bin-win64"
         paths:
-          - dist
+          - target/x86_64-pc-windows-gnu/release/*.dll
 
 package:
     stage: wheels
     script:
-      - maturin build --release --strip
+      - maturin build --release --zig
+      - mkdir -p dist
       - cp -t dist target/wheels/*.whl
     artifacts:
         name: "${RELEASE_NAME}-wheel-lin64"
@@ -69,7 +71,8 @@ package:
 package-win64:
     stage: wheels
     script:
-      - maturin build -i python3 --release --target x86_64-pc-windows-gnu
+      - maturin build --release --target x86_64-pc-windows-gnu
+      - mkdir -p dist
       - cp -t dist target/wheels/*.whl
     artifacts:
         name: "${RELEASE_NAME}-wheel-win64"
@@ -80,6 +83,7 @@ package-sdist:
     stage: wheels
     script:
       - maturin sdist
+      - mkdir -p dist
       - cp -t dist target/wheels/*.tar.gz
     artifacts:
         name: "${RELEASE_NAME}-sdist"
@@ -104,37 +108,50 @@ runtests:
 
 pubtest:
     stage: publish-test
+    variables:
+        MATURIN_REPOSITORY_URL: "${PYPI_SERVER}"
+        MATURIN_USERNAME: "${PYPI_USER}"
+        MATURIN_PASSWORD: "${PYPI_PASSWORD}"
     script:
-      - maturin upload --skip-existing -r "${PYPI_SERVER}" -u "${PYPI_USER}" -p "${PYPI_PASSWORD}" dist/*.whl dist/*.tar.gz
+      - maturin upload --skip-existing dist/*.whl
 
 test-install:
     stage: install-test
     image: ${PLG_CI_DOCKER_TAG}/python:latest
+    variables:
+        PIP_INDEX_URL: "${PYPI_INDEX_URL}"
     script:
-      - pip3 install "${CI_PROJECT_NAME}" --index-url "${PYPI_INDEX_URL}"
+      - pip3 install ${CI_PROJECT_NAME}
       - python3 -m unittest
 
 test-install-win64:
     stage: install-test
     tags:
-      - windows-docker
-    image: ${PLG_CI_DOCKER_TAG}/python_2004:latest
+      - ltsc2022-docker
+    image: ${PLG_CI_DOCKER_TAG}/python:3.11
     variables:
+        PIP_INDEX_URL: "${PYPI_INDEX_URL}"
         ErrorActionPreference: stop
     script:
-      - pip3 install "${CI_PROJECT_NAME}" --index-url "${PYPI_INDEX_URL}"
+      - pip3 install ${CI_PROJECT_NAME}
       - python -m unittest
 
 test-install-sdist:
     stage: install-test
     image: ${PLG_CI_DOCKER_TAG}/rusty-python:latest
+    variables:
+        PIP_INDEX_URL: "${PYPI_INDEX_URL}"
     script:
-      - pip3 install "${CI_PROJECT_NAME}" --no-binary "${CI_PROJECT_NAME}" --index-url "${PYPI_INDEX_URL}"
+      - pip3 install "${CI_PROJECT_NAME}" --no-binary "${CI_PROJECT_NAME}"
       - python3 -m unittest
 
 publish-wheels:
     stage: deploy
     only:
       - tags
+    variables:
+        MATURIN_REPOSITORY_URL: "${PLG_CI_PYPI_SERVER}"
+        MATURIN_USERNAME: "${PLG_CI_PYPI_USER}"
+        MATURIN_PASSWORD: "${PLG_CI_PYPI_PASSWORD}"
     script:
-      - maturin upload -r "${PLG_CI_PYPI_SERVER}" -u "${PLG_CI_PYPI_USER}" -p "${PLG_CI_PYPI_PASSWORD}" dist/*.whl dist/*.tar.gz
+      - maturin upload dist/*.whl
