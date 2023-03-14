@@ -40,7 +40,7 @@ use planetarium::{
 /// # Stretch by 1.5 in the X direction and rotate clockwise by 45 degrees.
 /// s3 = s2.stretch(1.5, 1.0).rotate(-45.0)
 /// ```
-#[pyclass(module = "pyplanetarium", freelist = 8)]
+#[pyclass(module = "pyplanetarium", frozen, freelist = 8)]
 struct SpotShape(RsSpotShape);
 
 /// Light spot descriptor type
@@ -49,7 +49,7 @@ struct SpotShape(RsSpotShape);
 ///
 /// `SpotId` objects are created by calling `add_spot()`
 /// method of a `Canvas` object.
-#[pyclass(module = "pyplanetarium", freelist = 8)]
+#[pyclass(module = "pyplanetarium", frozen, freelist = 8)]
 struct SpotId(RsSpotId);
 
 /// 2D affine transformation definition matrix
@@ -85,7 +85,7 @@ struct SpotId(RsSpotId);
 /// # Compose t4 and t2 as [t2][t4]
 /// t5 = t4.compose(t2)
 /// ```
-#[pyclass(module = "pyplanetarium", freelist = 8)]
+#[pyclass(module = "pyplanetarium", frozen, freelist = 8)]
 struct Transform(RsTransform);
 
 /// Canvas image window coordinates
@@ -112,7 +112,7 @@ struct Transform(RsTransform);
 /// # Move the window origin to (250, 150).
 /// wnd3 = wnd2.at(250, 150);
 /// ```
-#[pyclass(module = "pyplanetarium", freelist = 8)]
+#[pyclass(module = "pyplanetarium", frozen, freelist = 8)]
 struct Window(RsWindow);
 
 /// Exportable canvas image formats
@@ -128,7 +128,7 @@ struct Window(RsWindow);
 ///   `PngGamma8Bpp`     8-bit gamma-compressed grayscale PNG
 ///
 ///   `PngLinear16Bpp`   16-bit linear light grayscale PNG
-#[pyclass(module = "pyplanetarium", freelist = 8)]
+#[pyclass(module = "pyplanetarium", frozen, freelist = 8)]
 struct ImageFormat(RsImageFormat);
 
 /// Opaque light spots drawing canvas object
