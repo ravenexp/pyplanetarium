@@ -1,6 +1,6 @@
 //! Planetarium light spot rendering library bindings for Python.
 //!
-//! The Python bindings are implemented entirely in Rust using PyO3.
+//! The Python bindings are implemented entirely in Rust using [`pyo3`].
 
 use pyo3::exceptions::{PyNotImplementedError, PyTypeError, PyValueError};
 use pyo3::types::PyBytes;
@@ -395,7 +395,7 @@ impl Canvas {
     /// The position offset vector is added to the immutable spot position
     /// to calculate the spot rendering coordinates on the canvas.
     fn set_spot_offset(&mut self, spot: &SpotId, offset: Vector) {
-        self.0.set_spot_offset(spot.0, offset)
+        self.0.set_spot_offset(spot.0, offset);
     }
 
     /// Sets the internal light spot illumination state.
@@ -403,12 +403,12 @@ impl Canvas {
     /// The spot illumination factor is multiplied with the immutable spot
     /// intensity factor to calculate the rendered peak intensity.
     fn set_spot_illumination(&mut self, spot: &SpotId, illumination: f32) {
-        self.0.set_spot_illumination(spot.0, illumination)
+        self.0.set_spot_illumination(spot.0, illumination);
     }
 
     /// Clears the canvas image (fills with background pixels).
     fn clear(&mut self) {
-        self.0.clear()
+        self.0.clear();
     }
 
     /// Draws the light spots onto the canvas image.
@@ -433,7 +433,7 @@ impl Canvas {
     ///
     /// The light spot coordinates are defined in the world coordinate system only.
     fn set_view_transform(&mut self, transform: &Transform) {
-        self.0.set_view_transform(transform.0)
+        self.0.set_view_transform(transform.0);
     }
 
     /// Sets the global brightness level (light spot intensity adjustment).
@@ -481,7 +481,7 @@ impl Canvas {
     /// Implements `repr(x)` in Python.
     fn __repr__(&self) -> String {
         let (w, h) = self.0.dimensions();
-        format!("Canvas({}, {})", w, h)
+        format!("Canvas({w}, {h})")
     }
 }
 
