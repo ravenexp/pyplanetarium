@@ -1,5 +1,37 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
+
+## [0.1.6] - 2023-03-15
+
+### CI configuration
+
+- Update the config and clean up
+- Build and publish source distributions
+
+### Features
+
+- Handle `EncoderError::InvalidSubsamplingRate`
+- Add `pyclass(frozen)` attributes
+
+### Miscellaneous Tasks
+
+- Regenerate `cliff.toml`
+- Regenerate `pylintrc`
+
+### Refactor
+
+- Remove `pyo3(text_signature)` attrs
+- Fix pedantic Clippy warnings
+
+### Testing
+
+- Fix `tox` v4 and `rustup` interaction
+
+### Build
+
+- Update dependencies
+- Upgrade PyO3 dependency to v0.18
 
 ## [0.1.5] - 2022-05-11
 
