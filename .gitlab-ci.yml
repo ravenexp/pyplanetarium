@@ -113,7 +113,7 @@ pubtest:
         MATURIN_USERNAME: "${PYPI_USER}"
         MATURIN_PASSWORD: "${PYPI_PASSWORD}"
     script:
-      - maturin upload --skip-existing dist/*.whl
+      - maturin upload --skip-existing dist/*
 
 test-install:
     stage: install-test
@@ -154,4 +154,4 @@ publish-wheels:
         MATURIN_USERNAME: "${PLG_CI_PYPI_USER}"
         MATURIN_PASSWORD: "${PLG_CI_PYPI_PASSWORD}"
     script:
-      - maturin upload dist/*.whl
+      - maturin upload dist/*

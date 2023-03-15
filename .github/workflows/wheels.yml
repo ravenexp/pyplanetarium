@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: messense/maturin-action@v1
+    - uses: PyO3/maturin-action@v1
       with:
         args: --release
         manylinux: 2014
@@ -23,6 +23,8 @@ jobs:
         pip3 install maturin
     - name: Build 64-bit Windows wheels
       run: maturin build --release --target x86_64-pc-windows-gnu
+    - name: Build package source distribution
+      run: maturin sdist
     - uses: actions/upload-artifact@v3
       with:
         name: wheels
