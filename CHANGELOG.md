@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2023-03-16
+
+### Build
+
+- [**breaking**] Update `planetarium` dependency to v0.2.0
+
 ## [0.1.6] - 2023-03-15
 
 ### CI configuration
