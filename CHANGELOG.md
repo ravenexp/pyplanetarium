@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 2023-04-03
+
+### Documentation
+
+- Add more usage examples to README
+- Copy usage examples to the module docstring
+
+### Build
+
+- Add package metadata to `pyproject.toml`
+- Update PyO3 dependency to v0.18.2
+
 ## [0.2.0] - 2023-03-16
 
 ### Build
